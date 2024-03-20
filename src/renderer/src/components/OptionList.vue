@@ -3,7 +3,7 @@
  * @Description:
  * @Author: KeHan
  * @Date: 2024-03-19 15:19:08
- * @LastEditTime: 2024-03-20 15:58:51
+ * @LastEditTime: 2024-03-20 17:26:02
  * @LastEditors: KeHan
 -->
 <script setup lang="ts">
@@ -47,6 +47,7 @@ const sites: OptionSelects[] = [
                 <home />
               </n-icon>
             </n-button>
+            <p style="color: #c4c4c4"></p>
             <p style="color: #c4c4c4">首页</p>
           </div>
         </div>

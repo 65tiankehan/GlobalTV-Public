@@ -3,7 +3,7 @@
  * @Description:
  * @Author: KeHan
  * @Date: 2024-03-19 16:04:47
- * @LastEditTime: 2024-03-20 16:33:37
+ * @LastEditTime: 2024-03-20 17:08:06
  * @LastEditors: KeHan
 -->
 <script setup lang="ts">
@@ -260,6 +260,15 @@ const journalismList: tvDrama[] = [
             </div>
           </div>
         </div>
+        <n-progress
+          type="line"
+          :percentage="60"
+          :height="5"
+          :border-radius="4"
+          :fill-border-radius="0"
+          :show-indicator="false"
+
+        />
       </div>
     </div>
   </div>

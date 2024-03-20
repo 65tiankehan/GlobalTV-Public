@@ -1,0 +1,46 @@
+@import './base.css';
+
+html, body, #app {
+  height: 100%;
+  overflow: hidden;
+}
+#app {
+  background-color: #1b1b1f;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+body {
+  /* display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; */
+  /* background-image: url('./wavy-lines.svg'); */
+  background-size: cover;
+  user-select: none;
+}
+
+code {
+  font-weight: 600;
+  padding: 3px 5px;
+  border-radius: 2px;
+  background-color: var(--color-background-mute);
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    Liberation Mono,
+    monospace;
+  font-size: 85%;
+}
+
+#app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  /* margin-bottom: 80px; */
+}
+

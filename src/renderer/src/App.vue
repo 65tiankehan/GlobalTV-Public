@@ -1,5 +1,12 @@
+<!--
+ * @职业: 自由 开发者
+ * @Description:
+ * @Author: KeHan
+ * @Date: 2024-03-19 14:26:28
+ * @LastEditTime: 2024-03-21 10:43:50
+ * @LastEditors: KeHan
+-->
 <script setup lang="ts">
-import Layout from './components/Layout.vue'
 import { darkTheme } from 'naive-ui'
 // import Versions from './components/Versions.vue'
 
@@ -9,7 +16,11 @@ import { darkTheme } from 'naive-ui'
 <template>
   <n-config-provider :theme="darkTheme">
     <n-message-provider>
-      <Layout></Layout>
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </n-message-provider>
   </n-config-provider>
 </template>

@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const ipcHandleMax = () => window.electron.ipcRenderer.send('MaxWin')
+const ipcHandleMin = () => window.electron.ipcRenderer.send('MinWin')
+const ipcHandleClose = () => window.electron.ipcRenderer.send('closeWin')
+</script>
 
 <template>
   <div id="titleLabel">
@@ -107,7 +111,7 @@
       ></div>
       <div style="flex: 20%">
         <div class="Ternarylinkage">
-          <div class="BinarylinkageGan">
+          <div class="BinarylinkageGan" @click="ipcHandleClose">
             <svg
               t="1679034496978"
               class="icon"
@@ -126,7 +130,7 @@
             </svg>
           </div>
 
-          <div class="Binarylinkage">
+          <div class="Binarylinkage" @click="ipcHandleMax">
             <svg
               t="1679034543228"
               class="icon"
@@ -144,7 +148,7 @@
               ></path>
             </svg>
           </div>
-          <div class="Binarylinkage">
+          <div class="Binarylinkage" @click="ipcHandleMin">
             <svg
               t="1679034573870"
               class="icon"
@@ -163,52 +167,189 @@
             </svg>
           </div>
           <div class="Binarylinkage" style="width: 15%">
-            <svg
-              t="1710922892877"
-              class="icon"
-              viewBox="0 0 1024 1024"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              p-id="7749"
-              width="15"
-              height="15"
-            >
-              <path
-                d="M509.043157 417.431158c-52.987818 0-96.134501 43.098587-96.134501 96.133478 0 52.989865 43.146683 96.136547 96.134501 96.136547s96.134501-43.146683 96.134501-96.136547C605.178681 460.57784 562.030975 417.431158 509.043157 417.431158z"
-                fill="#272636"
-                p-id="7750"
-              ></path>
-              <path
-                d="M962.204074 505.346463c-1.732457-27.29567-8.763594-53.700039-20.889773-78.843696-4.623297-9.657964-13.860682-15.379269-25.25315-14.802124l-60.943001 3.778046c-7.297197-26.613124-17.48421-51.862181-30.391171-75.487252l48.923246-55.43352c7.033184-7.977695 8.555863-19.422352 3.829212-28.976962-12.33391-25.090445-28.975938-46.925752-49.340755-64.881706-20.422122-18.003026-44.148499-31.756261-70.501704-40.943504-9.971096-3.463891-21.205974-0.576121-28.29237 7.454786l-40.368406 45.721321c-23.883967-13.542434-48.925293-24.199145-74.854848-31.757285l-4.619204-73.963549c-0.683569-10.602476-7.664563-19.789719-17.743106-23.202445-24.783453-8.4126-50.126654-12.388145-76.031651-11.190877l0 0.082888-1.52575 0 0-0.082888c-25.90295-1.198292-51.248198 2.778276-76.030627 11.190877-10.079566 3.412726-17.060561 12.599969-17.743106 23.202445l-4.619204 73.963549c-25.931602 7.55814-50.971905 18.21485-74.854848 31.757285l-40.368406-45.721321c-7.088442-8.03193-18.322297-10.918677-28.293393-7.454786-26.353205 9.187243-50.079582 22.940478-70.500681 40.943504-20.36584 17.955954-37.007869 39.792285-49.341778 64.881706-4.725628 9.55461-3.202948 20.999266 3.830235 28.976962l48.924269 55.43352c-12.909008 23.62507-23.094998 48.874127-30.392194 75.487252l-60.943001-3.778046c-11.391445-0.577145-20.629853 5.143137-25.252127 14.802124-12.126178 25.143657-19.158339 51.548026-20.890796 78.843696-1.629103 27.244504 2.046612 54.384631 10.969842 80.736812 3.411703 10.027377 12.598946 17.009396 23.150256 17.691941l73.963549 4.618181c7.614421 25.931602 18.267039 51.074236 31.81459 74.855872l-45.828768 40.418548c-7.979742 7.090489-10.918677 18.269086-7.402597 28.293393 9.18622 26.354228 22.890336 50.030463 40.948621 70.659293 18.10945 20.36584 39.946804 37.007869 64.87966 49.29266 9.553587 4.720511 21.051455 3.201925 28.975938-3.88754l55.486732-48.873104c23.620977 12.915148 48.870034 23.044856 75.483158 30.342052l-3.77907 60.891835c-0.626263 10.658757 5.14416 20.577664 14.753005 25.195845 24.982998 12.181437 51.444673 19.266809 78.896908 20.998243 1.195222 0.092098 2.382257 0.153496 3.568269 0.211824l0 0.172939 3.158946 0 0-0.198521c1.041726-0.054235 2.082428-0.105401 3.131317-0.186242 27.452235-1.730411 53.91391-8.815783 78.897931-20.998243 9.608845-4.618181 15.379269-14.537088 14.753005-25.195845l-3.77907-60.891835c26.613124-7.29822 51.863205-17.426905 75.484182-30.342052l55.486732 48.873104c7.924483 7.089465 19.422352 8.608052 28.975938 3.88754 24.932856-12.284791 46.77021-28.92682 64.87966-49.29266 18.057261-20.62883 31.762401-44.305065 40.948621-70.659293 3.51608-10.025331 0.577145-21.203928-7.402597-28.293393l-45.828768-40.418548c13.546527-23.781636 24.199145-48.925293 31.81459-74.855872l73.963549-4.618181c10.55131-0.682545 19.736507-7.664563 23.14821-17.691941C960.157461 559.731094 963.833177 532.590967 962.204074 505.346463zM511.034511 705.69856c-105.96745 0-191.869912-86.424348-191.869912-193.032388 0-106.609063 85.902462-193.032388 191.869912-193.032388 105.966427 0 191.867866 86.423325 191.867866 193.032388C702.902376 619.274212 616.999914 705.69856 511.034511 705.69856z"
-                fill="#bfbfbf"
-                p-id="7751"
-                data-spm-anchor-id="a313x.search_index.0.i11.19ff3a81MiiXrv"
-                class="selected"
-              ></path>
-            </svg>
+            <n-popover trigger="click">
+              <template #trigger>
+                <div>
+                  <svg
+                    t="1710922892877"
+                    class="icon"
+                    viewBox="0 0 1024 1024"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    p-id="7749"
+                    width="15"
+                    height="15"
+                  >
+                    <path
+                      d="M509.043157 417.431158c-52.987818 0-96.134501 43.098587-96.134501 96.133478 0 52.989865 43.146683 96.136547 96.134501 96.136547s96.134501-43.146683 96.134501-96.136547C605.178681 460.57784 562.030975 417.431158 509.043157 417.431158z"
+                      fill="#272636"
+                      p-id="7750"
+                    ></path>
+                    <path
+                      d="M962.204074 505.346463c-1.732457-27.29567-8.763594-53.700039-20.889773-78.843696-4.623297-9.657964-13.860682-15.379269-25.25315-14.802124l-60.943001 3.778046c-7.297197-26.613124-17.48421-51.862181-30.391171-75.487252l48.923246-55.43352c7.033184-7.977695 8.555863-19.422352 3.829212-28.976962-12.33391-25.090445-28.975938-46.925752-49.340755-64.881706-20.422122-18.003026-44.148499-31.756261-70.501704-40.943504-9.971096-3.463891-21.205974-0.576121-28.29237 7.454786l-40.368406 45.721321c-23.883967-13.542434-48.925293-24.199145-74.854848-31.757285l-4.619204-73.963549c-0.683569-10.602476-7.664563-19.789719-17.743106-23.202445-24.783453-8.4126-50.126654-12.388145-76.031651-11.190877l0 0.082888-1.52575 0 0-0.082888c-25.90295-1.198292-51.248198 2.778276-76.030627 11.190877-10.079566 3.412726-17.060561 12.599969-17.743106 23.202445l-4.619204 73.963549c-25.931602 7.55814-50.971905 18.21485-74.854848 31.757285l-40.368406-45.721321c-7.088442-8.03193-18.322297-10.918677-28.293393-7.454786-26.353205 9.187243-50.079582 22.940478-70.500681 40.943504-20.36584 17.955954-37.007869 39.792285-49.341778 64.881706-4.725628 9.55461-3.202948 20.999266 3.830235 28.976962l48.924269 55.43352c-12.909008 23.62507-23.094998 48.874127-30.392194 75.487252l-60.943001-3.778046c-11.391445-0.577145-20.629853 5.143137-25.252127 14.802124-12.126178 25.143657-19.158339 51.548026-20.890796 78.843696-1.629103 27.244504 2.046612 54.384631 10.969842 80.736812 3.411703 10.027377 12.598946 17.009396 23.150256 17.691941l73.963549 4.618181c7.614421 25.931602 18.267039 51.074236 31.81459 74.855872l-45.828768 40.418548c-7.979742 7.090489-10.918677 18.269086-7.402597 28.293393 9.18622 26.354228 22.890336 50.030463 40.948621 70.659293 18.10945 20.36584 39.946804 37.007869 64.87966 49.29266 9.553587 4.720511 21.051455 3.201925 28.975938-3.88754l55.486732-48.873104c23.620977 12.915148 48.870034 23.044856 75.483158 30.342052l-3.77907 60.891835c-0.626263 10.658757 5.14416 20.577664 14.753005 25.195845 24.982998 12.181437 51.444673 19.266809 78.896908 20.998243 1.195222 0.092098 2.382257 0.153496 3.568269 0.211824l0 0.172939 3.158946 0 0-0.198521c1.041726-0.054235 2.082428-0.105401 3.131317-0.186242 27.452235-1.730411 53.91391-8.815783 78.897931-20.998243 9.608845-4.618181 15.379269-14.537088 14.753005-25.195845l-3.77907-60.891835c26.613124-7.29822 51.863205-17.426905 75.484182-30.342052l55.486732 48.873104c7.924483 7.089465 19.422352 8.608052 28.975938 3.88754 24.932856-12.284791 46.77021-28.92682 64.87966-49.29266 18.057261-20.62883 31.762401-44.305065 40.948621-70.659293 3.51608-10.025331 0.577145-21.203928-7.402597-28.293393l-45.828768-40.418548c13.546527-23.781636 24.199145-48.925293 31.81459-74.855872l73.963549-4.618181c10.55131-0.682545 19.736507-7.664563 23.14821-17.691941C960.157461 559.731094 963.833177 532.590967 962.204074 505.346463zM511.034511 705.69856c-105.96745 0-191.869912-86.424348-191.869912-193.032388 0-106.609063 85.902462-193.032388 191.869912-193.032388 105.966427 0 191.867866 86.423325 191.867866 193.032388C702.902376 619.274212 616.999914 705.69856 511.034511 705.69856z"
+                      fill="#bfbfbf"
+                      p-id="7751"
+                      data-spm-anchor-id="a313x.search_index.0.i11.19ff3a81MiiXrv"
+                      class="selected"
+                    ></path>
+                  </svg>
+                </div>
+              </template>
+              <!-- Blogger -->
+              <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__pulse">
+                <div
+                  class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                  style="justify-content: flex-start; height: 250px"
+                >
+                  <div
+                    style="display: flex; align-items: flex-start; justify-content: space-between"
+                  >
+                    <span>打开本地视频播放</span>
+                    <n-button size="tiny">打开</n-button>
+                  </div>
+                </div>
+              </div>
+              <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__pulse">
+                <div
+                  class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                  style="justify-content: flex-start; height: 250px"
+                >
+                  <div
+                    style="display: flex; align-items: flex-start; justify-content: space-between"
+                  >
+                    <span>打开下载视频</span>
+                    <n-button size="tiny">查看</n-button>
+                  </div>
+                </div>
+              </div>
+              <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__pulse">
+                <div
+                  class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                  style="justify-content: flex-start"
+                >
+                  <div
+                    style="display: flex; align-items: flex-start; justify-content: space-between"
+                  >
+                    <span>启动多线程下载</span>
+                    <n-switch :round="false" />
+                  </div>
+                </div>
+              </div>
+              <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__pulse">
+                <div
+                  class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                  style="justify-content: flex-start"
+                >
+                  <div
+                    style="display: flex; align-items: flex-start; justify-content: space-between"
+                  >
+                    <span>启动智能线路</span>
+                    <n-switch :round="false" />
+                  </div>
+                </div>
+              </div>
+            </n-popover>
           </div>
           <div class="Binarylinkage" style="width: 15%">
-            <svg
-              t="1710924711261"
-              class="icon"
-              viewBox="0 0 1024 1024"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              p-id="7189"
-              width="15"
-              height="15"
-            >
-              <path
-                d="M0 0m512 0l0 0q512 0 512 512l0 0q0 512-512 512l0 0q-512 0-512-512l0 0q0-512 512-512Z"
-                fill="#F62D5E"
-                p-id="7190"
-              ></path>
-              <path
-                d="M220.5696 312.9344H479.232v21.8112c-15.5648 2.0992-26.4192 5.4272-32.3072 10.1888-6.0416 4.6592-9.0624 12.032-9.0624 22.0672 0 14.2848 9.984 44.544 30.0544 90.8288 20.0704 46.2336 48.1792 104.1408 84.48 173.7216 37.9392-84.1216 64-144.7936 78.0288-181.9648 14.0288-37.3248 20.992-62.8736 20.992-76.8 0-11.6224-3.584-20.48-10.752-26.2144-7.168-5.888-19.1488-9.728-35.9424-11.52v-22.1184h199.5776v22.1184c-19.5584 1.4848-35.84 7.5776-48.9984 18.2272-13.056 10.8032-28.16 32.4608-45.056 65.28a4548.8128 4548.8128 0 0 0-75.9296 158.208 6932.5824 6932.5824 0 0 0-85.3504 194.4576c-13.568 24.832-56.5248 25.6512-68.4032 0-15.6672-32.1536-37.1712-76.3904-64.3584-132.9664-97.28-202.0864-161.3824-303.2064-192.0512-303.2064h-3.5328v-22.1184z"
-                fill="#FFFFFF"
-                p-id="7191"
-              ></path>
-            </svg>
+            <n-popover trigger="click">
+              <template #trigger>
+                <div>
+                  <svg
+                    t="1710924711261"
+                    class="icon"
+                    viewBox="0 0 1024 1024"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    p-id="7189"
+                    width="15"
+                    height="15"
+                  >
+                    <path
+                      d="M0 0m512 0l0 0q512 0 512 512l0 0q0 512-512 512l0 0q-512 0-512-512l0 0q0-512 512-512Z"
+                      fill="#F62D5E"
+                      p-id="7190"
+                    ></path>
+                    <path
+                      d="M220.5696 312.9344H479.232v21.8112c-15.5648 2.0992-26.4192 5.4272-32.3072 10.1888-6.0416 4.6592-9.0624 12.032-9.0624 22.0672 0 14.2848 9.984 44.544 30.0544 90.8288 20.0704 46.2336 48.1792 104.1408 84.48 173.7216 37.9392-84.1216 64-144.7936 78.0288-181.9648 14.0288-37.3248 20.992-62.8736 20.992-76.8 0-11.6224-3.584-20.48-10.752-26.2144-7.168-5.888-19.1488-9.728-35.9424-11.52v-22.1184h199.5776v22.1184c-19.5584 1.4848-35.84 7.5776-48.9984 18.2272-13.056 10.8032-28.16 32.4608-45.056 65.28a4548.8128 4548.8128 0 0 0-75.9296 158.208 6932.5824 6932.5824 0 0 0-85.3504 194.4576c-13.568 24.832-56.5248 25.6512-68.4032 0-15.6672-32.1536-37.1712-76.3904-64.3584-132.9664-97.28-202.0864-161.3824-303.2064-192.0512-303.2064h-3.5328v-22.1184z"
+                      fill="#FFFFFF"
+                      p-id="7191"
+                    ></path>
+                  </svg>
+                </div>
+              </template>
+              <!-- Blogger -->
+              <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__pulse">
+                <div
+                  class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                  style="justify-content: flex-start; height: 250px !important"
+                >
+                  <!-- <div
+                    style="display: flex; align-items: flex-start; justify-content: space-between"
+                  >
+                    <span>UP主：盛为梦-Azure</span>
+                    <n-button size="tiny">关注</n-button>
+                  </div> -->
+                  <div style="width: 100%; height: 100px">
+                    <div style="float: left; width: 50%; height: 100%">
+                      <img
+                        style="width: 100%; height: 100%; border-radius: 15px"
+                        src="https://i1.hdslb.com/bfs/face/d5e1506c886cf86475ff729a6a7f0d65115bd873.jpg@240w_240h_1c_1s_!web-avatar-space-header.avif"
+                      />
+                    </div>
+                    <div style="float: right; width: 50%; height: 100%">
+                      <span style="font-size: 10px">1999年2月出生</span>
+                      <p style="font-size: 10px">性别：男</p>
+                      <p style="font-size: 10px">学校：清华大学18届</p>
+                      <p style="font-size: 10px">所属学科：计算机科学与技术</p>
+                    </div>
+                  </div>
+                  <div style="text-align: left; padding: 3px; padding-left: 0">
+                    <span
+                      >技术老、测试员、喝咖啡，努力赚钱才是王道，保重身体更是重中之重,修生养息</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__pulse">
+                <div
+                  class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                  style="justify-content: flex-start; height: 250px"
+                >
+                  <div
+                    style="display: flex; align-items: flex-start; justify-content: space-between"
+                  >
+                    <span>UP主：盛为梦-Azure</span>
+                    <n-button size="tiny">关注</n-button>
+                  </div>
+                </div>
+              </div>
+              <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__pulse">
+                <div
+                  class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                  style="justify-content: flex-start; height: 250px"
+                >
+                  <div
+                    style="display: flex; align-items: flex-start; justify-content: space-between"
+                  >
+                    <span>粉丝</span>
+                    <n-button size="tiny">200+</n-button>
+                  </div>
+                </div>
+              </div>
+              <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__pulse">
+                <div
+                  class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                  style="justify-content: flex-start; height: 250px"
+                >
+                  <div
+                    style="display: flex; align-items: flex-start; justify-content: space-between"
+                  >
+                    <span>动态</span>
+                    <n-button size="tiny">100+</n-button>
+                  </div>
+                </div>
+              </div>
+            </n-popover>
           </div>
           <div class="Binarylinkage" style="width: 15%">
             <n-popover trigger="hover">
@@ -242,7 +383,7 @@
                 closable
                 :bordered="false"
               >
-               《美剧》，于2024年3月20日，正在下载中..
+                《美剧》，于2024年3月20日，正在下载中..
               </n-alert>
             </n-popover>
           </div>
@@ -333,5 +474,52 @@
   background-color: #222222;
   border-top: 0.1px solid #4d4b4b;
   /* border-right: 0.1px solid #4d4b4b; */
+}
+
+.accountPmc_Card_P {
+  width: 230px;
+  height: 220px;
+  background-color: rgb(39, 39, 39);
+  border: 1px solid rgb(28, 28, 28);
+  border-radius: 5px;
+  margin: 4px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  flex: 1 1 auto;
+  padding: 10px;
+  text-align: center;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s !important;
+}
+.accountPmc_Card_P:hover {
+  /* box-shadow: 0 16px 32px 0 rgba(48, 55, 66, 0.15); */
+
+  /* transition-delay: 0s !important; */
+  /* border: 1px solid #78a4fa; */
+
+  /* transform: translateY(-10px)  !important; */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  /* animation: sparkle 0.5s infinite; */
+}
+.accountPmc_Card_P_d {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+.setup_button_height {
+  height: 55px !important;
+}
+.accountPmc_Card_P_Hideout {
+  height: 40px !important;
+}
+.accountPmc_Card_row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+.accountPmc_Card {
+  margin-top: 3px;
+  flex: 1 1 auto;
 }
 </style>

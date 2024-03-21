@@ -3,7 +3,7 @@
  * @Description:
  * @Author: KeHan
  * @Date: 2024-03-19 14:26:28
- * @LastEditTime: 2024-03-20 15:26:51
+ * @LastEditTime: 2024-03-21 11:45:38
  * @LastEditors: KeHan
  */
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
@@ -23,6 +23,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
+      webSecurity: false,
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       nodeIntegration: true,
@@ -46,6 +47,16 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  ipcMain.on('closeWin', () => {
+    mainWindow.destroy()
+  })
+  ipcMain.on('MaxWin', () => {
+    mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize()
+  })
+  ipcMain.on('MinWin', () => {
+    mainWindow.minimize()
+  })
 }
 
 // This method will be called when Electron has finished

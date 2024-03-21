@@ -3,7 +3,7 @@
  * @Description:
  * @Author: KeHan
  * @Date: 2024-03-19 14:36:21
- * @LastEditTime: 2024-03-20 17:36:28
+ * @LastEditTime: 2024-03-21 13:19:37
  * @LastEditors: KeHan
 -->
 <script setup lang="ts">
@@ -11,14 +11,14 @@ import OptionList from './OptionList.vue'
 import TVDramaCanvas from './TVDramaCanvas.vue'
 import OptionListSub from './OptionListSub.vue'
 import Taskbar from './Taskbar.vue'
-import Blogger from './Blogger.vue'
+
 </script>
 
 <template>
   <div style="height: 100%; width: 100%">
     <Taskbar />
     <!-- home -->
-    <div style="width: 100%; height: 100%" v-show="false">
+    <div style="width: 100%; height: 100%" v-show="true">
       <div class="left_layout" style="padding-top: 39px">
         <OptionList />
       </div>
@@ -39,16 +39,14 @@ import Blogger from './Blogger.vue'
         >
           <n-breadcrumb>
             <n-breadcrumb-item> 电视剧</n-breadcrumb-item>
-            <n-breadcrumb-item> 国产剧</n-breadcrumb-item>
-            <n-breadcrumb-item> 警察系</n-breadcrumb-item>
+            <n-breadcrumb-item> 首页</n-breadcrumb-item>
+            <!-- <n-breadcrumb-item> 皇朝系</n-breadcrumb-item> -->
           </n-breadcrumb>
         </div>
         <TVDramaCanvas />
       </div>
     </div>
-    <div style="width: 100%; height: 100%;padding:10px;padding-top: 39px;">
-      <Blogger />
-    </div>
+
   </div>
 </template>
 

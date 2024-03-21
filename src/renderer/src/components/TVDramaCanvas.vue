@@ -3,150 +3,110 @@
  * @Description:
  * @Author: KeHan
  * @Date: 2024-03-19 16:04:47
- * @LastEditTime: 2024-03-20 17:08:06
+ * @LastEditTime: 2024-03-21 13:57:12
  * @LastEditors: KeHan
 -->
 <script setup lang="ts">
+import * as cheerio from 'cheerio'
+import { ref } from 'vue'
+import axios from 'axios'
+import { useMessage } from 'naive-ui'
+
 import {
   LogoMarkdown as LogoMarkdown,
   PlayCircleSharp as LogoGooglePlaystore
 } from '@vicons/ionicons5'
 interface tvDrama {
-  comment?: string
-  Preview?: string
+  comment?: number
+  Preview?: number
   NexT?: string
   name?: string
-  like?: string
+  like?: number
   moviesTab?: string
+  moviesUrl?: string
+  moviesImgUrl?: string
+  download?: boolean
 }
-const journalismList: tvDrama[] = [
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '美剧'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '美国电影'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '国产剧'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '古装'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '战争'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '青春偶像'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '喜剧'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '家庭'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '犯罪'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '动作'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '奇幻'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '剧情'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '历史'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '经典'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '乡村'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '情景'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '商战'
-  },
-  {
-    comment: '24',
-    like: '34',
-    Preview: '123',
-    NexT: '这是测试描述，为了测试描述的情况，剩余的字段都是废话，没什么可看',
-    name: '网剧'
-  }
-]
+
+const journalismList = ref<tvDrama[]>([])
+const message = useMessage()
+const classAnswerX = ref(0)
+const dataIndexX = ref(0)
+const totalSUrlElX = ref('')
+const totalSUrlX = ref('')
+const typeUrlIpX = ref('')
+const LatestMovies = ref([])
+const tuplesX = ref([])
+const typeMap = {
+  电影: { classAnswer: 0, totalSUrl: '1' },
+  电视剧: { classAnswer: 1, totalSUrl: '2' },
+  动漫: { classAnswer: 3, totalSUrl: '4' },
+  综艺: { classAnswer: 2, totalSUrl: '3' }
+}
+
+// const typeUrl = new Map([
+//   ['动漫', 'https://www.yydstv.net/s/4-{1}-{5}-{0}-{2}-{4}------{3}.html'],
+//   ['综艺', 'https://www.yydstv.net/s/3-{1}-{5}-{0}-{2}-{4}------{3}.html'],
+//   ['电影', 'https://www.yydstv.net/s/{0}-{2}-{6}-{1}-{3}-{4}------{5}.html'],
+//   ['电视剧', 'https://www.yydstv.net/s/{0}-{2}-{6}-{1}-{3}-{4}------{5}.html']
+// ])
+
+message.loading('正在加载影视数据')
+const mountedFun = () => {
+  const { classAnswer, totalSUrl } = typeMap['电影']
+  const netWorkUrl = `https://www.yyds.one/s/${totalSUrl}--------${dataIndexX.value}---.html`
+  const eal = 'https://www.yyds.one/'
+
+  classAnswerX.value = classAnswer
+  totalSUrlX.value = netWorkUrl
+  totalSUrlElX.value = eal
+  typeUrlIpX.value = ''
+
+  axios
+    .get(totalSUrlElX.value)
+    .then((resp) => {
+      console.log('成功')
+      LatestMovies.value = []
+      tuplesX.value = []
+      const $ = cheerio.load(resp.data)
+
+      const arrx: tvDrama[] = []
+      //最新影片 start
+      $($('div.module-items').children('div.module-item')).each(function (n, m) {
+        const pro = {
+          moviesUrl: $($($(m).children('div.module-item-cover')).children('div.module-item-pic'))
+            .children('img')
+            .attr('data-src'),
+          moviesImgUrl: $($($(m).children('div.module-item-cover')).children('div.module-item-pic'))
+            .children('a')
+            .attr('href'),
+          name: $($($(m).children('div.module-item-cover')).children('div.module-item-pic'))
+            .children('a')
+            .attr('title'),
+          Preview: Math.floor(Math.random() * 100) + 1,
+          like: Math.floor(Math.random() * 100) + 1,
+          comment: Math.floor(Math.random() * 100) + 1,
+          download: false
+        }
+
+        $($($(m).children('div.module-item-cover')).children('div.module-item-content'))
+          .children('div.module-item-style')
+          .each(function (b, j) {
+            if (b == 2) {
+              pro['NexT'] = $(j).text()
+            }
+          })
+        arrx.push(pro)
+      })
+
+      // eslint-disable-next-line vue/no-ref-as-operand
+      journalismList.value = arrx
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
+mountedFun()
 </script>
 
 <template>
@@ -170,10 +130,7 @@ const journalismList: tvDrama[] = [
       >
         <div class="homeTitleCarImg" style="position: relative">
           <!-- <img class="homeTitleCarImgI" :src="item.img" /> -->
-          <img
-            class="homeTitleCarImgI"
-            src="https://c.xkx61.com/upload/vod/20240226-1/562765c725adf8553b7c66bff19e99be.jpg"
-          />
+          <img class="homeTitleCarImgI" :src="item.moviesUrl" />
           <div style="position: absolute; z-index: 3; top: 5px; right: 8px">
             <n-button text style="font-size: 24px">
               <n-icon>
@@ -260,15 +217,16 @@ const journalismList: tvDrama[] = [
             </div>
           </div>
         </div>
-        <n-progress
-          type="line"
-          :percentage="60"
-          :height="5"
-          :border-radius="4"
-          :fill-border-radius="0"
-          :show-indicator="false"
-
-        />
+        <div v-show="item.download">
+          <n-progress
+            type="line"
+            :percentage="60"
+            :height="5"
+            :border-radius="4"
+            :fill-border-radius="0"
+            :show-indicator="false"
+          />
+        </div>
       </div>
     </div>
   </div>

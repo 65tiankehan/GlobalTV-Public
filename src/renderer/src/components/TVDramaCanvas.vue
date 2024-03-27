@@ -65,7 +65,7 @@ const mountedFun = () => {
   axios
     .get(totalSUrlElX.value)
     .then((resp) => {
-      console.log('成功')
+
       LatestMovies.value = []
       tuplesX.value = []
       const $ = cheerio.load(resp.data)
@@ -73,6 +73,7 @@ const mountedFun = () => {
       const arrx: tvDrama[] = []
       //最新影片 start
       $($('div.module-items').children('div.module-item')).each(function (n, m) {
+
         const pro = {
           moviesUrl: $($($(m).children('div.module-item-cover')).children('div.module-item-pic'))
             .children('img')

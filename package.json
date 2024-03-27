@@ -29,6 +29,8 @@
     "axios": "^1.6.8",
     "cheerio": "^1.0.0-rc.12",
     "electron-updater": "^6.1.7",
+    "hls.js": "^1.5.7",
+    "nplayer": "^1.0.15",
     "vue-router": "^4.3.0",
     "vuex": "^4.1.0"
   },

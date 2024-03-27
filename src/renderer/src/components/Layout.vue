@@ -3,7 +3,7 @@
  * @Description:
  * @Author: KeHan
  * @Date: 2024-03-19 14:36:21
- * @LastEditTime: 2024-03-21 13:19:37
+ * @LastEditTime: 2024-03-27 12:07:52
  * @LastEditors: KeHan
 -->
 <script setup lang="ts">
@@ -11,14 +11,14 @@ import OptionList from './OptionList.vue'
 import TVDramaCanvas from './TVDramaCanvas.vue'
 import OptionListSub from './OptionListSub.vue'
 import Taskbar from './Taskbar.vue'
-
+import Play from './Play.vue'
 </script>
 
 <template>
   <div style="height: 100%; width: 100%">
     <Taskbar />
     <!-- home -->
-    <div style="width: 100%; height: 100%" v-show="true">
+    <div style="width: 100%; height: 100%" v-show="false">
       <div class="left_layout" style="padding-top: 39px">
         <OptionList />
       </div>
@@ -46,7 +46,11 @@ import Taskbar from './Taskbar.vue'
         <TVDramaCanvas />
       </div>
     </div>
-
+    <div style="width: 100%; height: 100%" v-if="true">
+      <div style="padding-top: 39px; height: 100%; width: 100%">
+        <Play />
+      </div>
+    </div>
   </div>
 </template>
 

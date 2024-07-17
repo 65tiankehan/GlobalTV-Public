@@ -302,7 +302,7 @@ onMounted(() => {
         >
       </div>
     </div>
-    <!-- <div>
+     <div>
       <n-carousel autoplay>
         <img
           class="carousel-img"
@@ -321,7 +321,7 @@ onMounted(() => {
           src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel4.jpeg"
         />
       </n-carousel>
-    </div> -->
+    </div>
   </div>
 </template>
 

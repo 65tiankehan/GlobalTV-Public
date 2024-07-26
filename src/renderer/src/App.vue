@@ -15,13 +15,21 @@ import { darkTheme } from 'naive-ui'
 
 <template>
   <n-config-provider :theme="darkTheme">
-    <n-message-provider>
-      <router-view v-slot="{ Component }">
-        <keep-alive>
-          <component :is="Component" />
-        </keep-alive>
-      </router-view>
-    </n-message-provider>
+    <n-notification-provider :placement="'bottom-right'">
+      <n-modal-provider>
+        <n-loading-bar-provider>
+          <n-dialog-provider>
+            <n-message-provider>
+              <router-view v-slot="{ Component }">
+                <keep-alive>
+                  <component :is="Component" />
+                </keep-alive>
+              </router-view>
+            </n-message-provider>
+          </n-dialog-provider>
+        </n-loading-bar-provider>
+      </n-modal-provider>
+    </n-notification-provider>
   </n-config-provider>
 </template>
 <style scoped>
@@ -30,3 +38,4 @@ import { darkTheme } from 'naive-ui'
   height: 100% !important;
 }
 </style>
+

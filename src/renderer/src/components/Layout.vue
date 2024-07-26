@@ -14,14 +14,53 @@ import OptionListSub from './OptionListSub.vue'
 import Taskbar from './Taskbar.vue'
 import Play from './Play.vue'
 
-import { computed, ref } from 'vue'
+import axios from 'axios'
+import * as cheerio from 'cheerio'
+
+import { computed, ref, watch } from 'vue'
 
 interface Notice {
   title: string,
   message: string
 }
 
-const showModel = ref(true)
+//定义线路
+interface EpisodeCollection {
+  title?: string,
+  url?: string
+}
+
+//定义线路集合接口
+interface streamingSources {
+  name?: string,
+  EpisodeCollection: EpisodeCollection[]
+}
+
+//定义标签接口
+interface tag {
+  name?: string,
+  color?: string
+}
+
+//定义详情接口
+interface tvDrama {
+  title?: string,
+  imgUrl?: string,
+  tags?: tag[],
+  Scenario?: string,
+  streamingSources?: streamingSources[]
+}
+
+// 创建一个 tvDrama 类型的变量
+const dramaDetails = ref<tvDrama>({
+  title: '',
+  imgUrl: '',
+  tags: [],
+  Scenario: '',
+  streamingSources: []
+})
+
+const showModel = ref(false)
 const store = useStore()
 // 使用computed属性来访问getter
 const breadcrumbs = computed(() => store.getters.getBreadcrumbs)
@@ -33,6 +72,8 @@ const payVideoUrl = computed(() => store.getters.getPayVideoUrl)
 // 直接从 store 访问状态，这个是分类起始地址，当改变时，会触发计算属性的 getter
 const playVideoType = computed(() => store.state.playVideoType)
 
+// 使用computed属性来访问getter
+const videoDetailsLoading = computed(() => store.getters.getVideoDetailsLoading)
 
 // 使用computed属性来访问getter
 const page = computed(() => store.state.page)
@@ -92,6 +133,65 @@ const startUpdate = () => {
   setNotices(notices.value)
 }
 
+//得到详情地址，去除地址中的${及其后面的字符串，返回剩于字符串
+function extractBeforeDollarBrace(str: string): string {
+  const index = str.indexOf('${')
+  if (index !== -1) {
+    return str.slice(0, index)
+  }
+  return str // 如果没有找到 '${'，返回原始字符串
+}
+
+//随机返回标签颜色
+function getRandomType(): 'default' | 'primary' | 'info' | 'success' | 'warning' | 'error' {
+  const types: ('default' | 'primary' | 'info' | 'success' | 'warning' | 'error')[] = ['default', 'primary', 'info', 'success', 'warning', 'error']
+  const randomIndex = Math.floor(Math.random() * types.length)
+  return types[randomIndex]
+}
+
+//监听是否需要展开详情
+watch(videoDetailsLoading, (newVal, oldVal) => {
+  console.log('videoDetailsLoading changed from', oldVal, 'to', newVal)
+
+  axios
+    .get(payVideoUrl.value.slice(0, payVideoUrl.value.length - 1) + extractBeforeDollarBrace(newVal))
+    .then((resp) => {
+      const $ = cheerio.load(resp.data)
+      console.log('详情')
+
+      let tagLength = $($('div.video-info').children('div.video-info-main')).children('div.video-info-items').length
+      //得到详情和tag
+      $($('div.video-info').children('div.video-info-main')).children('div.video-info-items').each(function(n, m) {
+        console.log('第' + (n + 1) + '条')
+
+
+        //不找最后一条，因为最后一条是剧情
+        if (n < tagLength - 1) {
+          if (dramaDetails.value.tags)
+            dramaDetails.value.tags.push({
+              name: $(m).children('span.video-info-itemtitle').text() +
+                ($(m).children('div.video-info-item').text().length > 20
+                  ? $(m).children('div.video-info-item').text().slice(0, 20) + '...'
+                  : $(m).children('div.video-info-item').text()), color: getRandomType()
+            })
+        } else {
+          dramaDetails.value.Scenario = $(m).children('div.video-info-item').text()
+        }
+
+      })
+
+      dramaDetails.value.title = $($($('div.video-cover').children('div.module-item-cover')).children('div.module-item-pic')).children('img').attr('alt')
+
+      dramaDetails.value.imgUrl = $($($('div.video-cover').children('div.module-item-cover')).children('div.module-item-pic')).children('img').attr('data-src')
+
+
+      //当上方数据加载完成后，展开窗口
+      showModel.value = true
+    }).catch((err) => {
+    console.log(err)
+  })
+
+})
 </script>
 
 <template>
@@ -184,7 +284,7 @@ const startUpdate = () => {
   <n-modal v-model:show="showModel">
     <n-card
       style="width: 650px"
-      title="邪恶第四季"
+      :title="dramaDetails.title"
       :bordered="false"
       size="huge"
       role="dialog"
@@ -216,54 +316,27 @@ const startUpdate = () => {
 
           <div style="height: 300px;width: 200px;padding: 5px;border-radius: 5px;  border: 1px dashed #3f3f44;">
             <img style="width: 100%;height: 100%"
-                 src="https://v.376ju.com/upload/vod/20240523-1/2a12d4f8870237e02ce3203819860983.jpg" />
+                 :src="dramaDetails.imgUrl" />
           </div>
 
           <div style="height: 300px;width: 350px">
             <n-space vertical>
               <n-breadcrumb>
-                <n-breadcrumb-item>
-                  首页
-                </n-breadcrumb-item>
-                <n-breadcrumb-item>
-                  美剧
-                </n-breadcrumb-item>
-                <n-breadcrumb-item>
-                  2024
-                </n-breadcrumb-item>
+                <n-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="index"> {{ item }}</n-breadcrumb-item>
               </n-breadcrumb>
-              <div style="width: 100%;height: 100px" class="NeworldscroE">
+              <div style="width: 100%;height: 100px;overflow-x:auto" class="NeworldscroE">
                 <n-space>
-                  <n-tag round> 连续剧</n-tag>
-                  <n-tag round type="success">
-                    美国
+
+                  <n-tag v-for="(item,index) in dramaDetails.tags" :key="index" round :type="item.color">
+                    {{ item.name }}
                   </n-tag>
-                  <n-tag round type="warning">
-                    2024
-                  </n-tag>
-                  <n-tag round type="error">
-                    麦克·柯尔特/卡佳·赫尔伯斯
-                  </n-tag>
-                  <n-tag round type="info">
-                    更新：07.26
-                  </n-tag>
-                  <n-tag round type="info">
-                    集数：已完结
-                  </n-tag>
-                  <n-tag round type="info">
-                    上映：2024
-                  </n-tag>
+
                 </n-space>
               </div>
 
               <p>剧情：</p>
               <div style="width: 100%;height: 130px;" class="NeworldscroE">
-                《邪恶力量第四季》是美国的一部悬疑题材电视剧，由Robert Singer执导，詹森·阿克斯、贾德·帕达里克等主演。
-                [1]该剧讲述了进入Ruby体内的Lilith将地狱之犬放入屋内，Dean被拖入黑暗的地狱，而就在Lilith想要消灭Sam的时候，却发现Sam对她的力量免疫。
-                《邪恶力量第四季》是美国的一部悬疑题材电视剧，由Robert Singer执导，詹森·阿克斯、贾德·帕达里克等主演。
-                [1]该剧讲述了进入Ruby体内的Lilith将地狱之犬放入屋内，Dean被拖入黑暗的地狱，而就在Lilith想要消灭Sam的时候，却发现Sam对她的力量免疫。
-                《邪恶力量第四季》是美国的一部悬疑题材电视剧，由Robert Singer执导，詹森·阿克斯、贾德·帕达里克等主演。
-                [1]该剧讲述了进入Ruby体内的Lilith将地狱之犬放入屋内，Dean被拖入黑暗的地狱，而就在Lilith想要消灭Sam的时候，却发现Sam对她的力量免疫。
+                {{ dramaDetails.Scenario }}
               </div>
 
             </n-space>
@@ -274,212 +347,22 @@ const startUpdate = () => {
         </n-space>
         <n-space>
 
-          <div style="width: 570px;height: 300px" >
+          <div style="width: 570px;height: 300px">
             <n-tabs type="segment" animated>
-              <n-tab-pane name="chap1" tab="sx1线路">
-              <div style="width: 100%;height: 250px" class="NeworldscroE">
-                <n-space >
-                  <n-button strong secondary style="width: 71px;">
-                    第1集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第2集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第3集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第4集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第5集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第6集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第7集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第8集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第9集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第10集
-                  </n-button>
+              <n-tab-pane v-for="(item,index) in dramaDetails.streamingSources" :key="index" :name="item.name"
+                          :tab="item.name">
+                <div style="width: 100%;height: 250px" class="NeworldscroE">
+                  <n-space>
+                    <n-button strong secondary style="width: 71px;" v-for="(item2,index2) in item.EpisodeCollection "
+                              :key="index2">
+                      {{ item2.title }}
+                    </n-button>
 
-                  <n-button strong secondary style="width: 71px;">
-                    第11集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第12集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第13集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第14集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第15集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第16集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第17集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第18集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第19集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第20集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第1集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第2集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第3集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第4集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第5集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第6集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第7集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第8集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第9集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第10集
-                  </n-button>
-
-                  <n-button strong secondary style="width: 71px;">
-                    第11集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第12集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第13集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第14集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第15集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第16集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第17集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第18集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第19集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第20集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第1集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第2集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第3集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第4集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第5集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第6集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第7集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第8集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第9集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第10集
-                  </n-button>
-
-                  <n-button strong secondary style="width: 71px;">
-                    第11集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第12集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第13集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第14集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第15集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第16集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第17集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第18集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第19集
-                  </n-button>
-                  <n-button strong secondary style="width: 71px;">
-                    第20集
-                  </n-button>
-                </n-space>
-              </div>
+                  </n-space>
+                </div>
 
               </n-tab-pane>
-              <n-tab-pane name="chap2" tab="QRT线路">
-                “威尔！着火了！快来帮忙！”我听到女朋友大喊。现在一个难题在我面前——是恢复一个重要的
-                Amazon 服务，还是救公寓的火。<br><br>
-                我的脑海中忽然出现了 Amazon
-                著名的领导力准则”客户至上“，有很多的客户还依赖我们的服务，我不能让他们失望！所以着火也不管了，女朋友喊我也无所谓，我开始
-                debug 这个线上问题。
-              </n-tab-pane>
-              <n-tab-pane name="chap3" tab="Yhn线路">
-                但是忽然，公寓的烟味消失，火警也停了。我的女朋友走进了房间，让我震惊的是，她摘下了自己的假发，她是
-                Jeff Bezos（Amazon 老板）假扮的！<br><br>
-                “我对你坚持顾客至上的原则感到十分骄傲”，说完，他递给我一张五美金的亚马逊礼品卡，从我家窗户翻了出去，跳上了一辆
-                Amazon 会员服务的小货车，一溜烟离开了。<br><br>虽然现在我已不在 Amazon
-                工作，但我还是非常感激在哪里学的到的经验，这些经验我终身难忘。你们同意么？
-              </n-tab-pane>
+
             </n-tabs>
           </div>
 

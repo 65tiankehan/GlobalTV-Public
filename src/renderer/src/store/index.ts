@@ -21,7 +21,8 @@ export default createStore({
       total: 0,
       PaginationUrl: '',
       notices: [] as Notice[],//通知消息
-      showUpdate: false
+      showUpdate: false,
+      videoDetailsLoading: ''//视频详情加载url，这个一发生变化，就弹开详情窗口，进入详情加载
     }
   },
   getters: {
@@ -66,6 +67,9 @@ export default createStore({
     },
     getShowUpdate: (state) => {
       return state.showUpdate
+    },
+    getVideoDetailsLoading: (state) => {
+      return state.videoDetailsLoading
     }
 
   },
@@ -111,6 +115,9 @@ export default createStore({
     },
     SET_SHOWUPDATE: (state, payload) => {
       state.showUpdate = payload
+    },
+    SET_VIDEODETAILSLOADING: (state, payload) => {
+      state.videoDetailsLoading = payload
     }
   }
 })

@@ -59,6 +59,12 @@ const setNotices = (notices: Notice[]) => {
   store.commit('SET_NOTICES', notices)
 }
 
+// 使用store.commit来调用mutation
+const setVideoDetailsLoading = (url: string) => {
+  store.commit('SET_VIDEODETAILSLOADING', url)
+}
+
+
 const NeworldscroE = ref<HTMLElement | null>(null)
 const journalismList = ref<tvDrama[]>([])
 const message = useMessage()
@@ -252,6 +258,18 @@ const stopProgressAnimation = () => {
   }
 }
 
+//通知Layout进入详情加载
+const showDetails = (url: string | undefined) => {
+
+  if (url) {
+    // 获取当前时间的时间戳
+    const timestamp = Date.now()
+    setVideoDetailsLoading(url + '${' + `${timestamp}`)
+  } else {
+
+  }
+
+}
 
 </script>
 
@@ -309,7 +327,7 @@ const stopProgressAnimation = () => {
               z-index: 3;
             "
           >
-            <n-button text style="font-size: 24px">
+            <n-button text style="font-size: 24px" @click="showDetails(item.moviesImgUrl)">
               <n-icon>
                 <logoGoogle-playstore />
               </n-icon>

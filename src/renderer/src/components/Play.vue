@@ -27,7 +27,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="left_layout">
+  <div v-show="false" class="left_layout">
     <div style="width: 100%; height: 45%; position: relative">
       <div
         style="
@@ -210,19 +210,19 @@ onMounted(() => {
       <n-h3 style="text-align: center">
         潘多拉第一季
       </n-h3>
-      <n-tabs type="segment" animated>
+      <n-tabs type="bar" animated placement="right">
         <n-tab-pane name="chap1" tab="线路1">
-          <n-space justify="space-between">
-            <n-button tertiary round>
+          <n-space justify="end">
+            <n-button strong secondary>
               第1集
             </n-button>
-            <n-button tertiary round>
+            <n-button strong secondary>
               第2集
             </n-button>
-            <n-button tertiary round>
+            <n-button strong secondary>
               第3集
             </n-button>
-            <n-button tertiary round>
+            <n-button strong secondary>
               第4集
             </n-button>
 
@@ -230,34 +230,34 @@ onMounted(() => {
 
         </n-tab-pane>
         <n-tab-pane name="chap2" tab="线路2">
-          <n-space justify="space-between">
-            <n-button tertiary round>
+          <n-space justify="end">
+            <n-button strong secondary>
               第1集
             </n-button>
-            <n-button tertiary round>
+            <n-button strong secondary>
               第2集
             </n-button>
-            <n-button tertiary round>
+            <n-button strong secondary>
               第3集
             </n-button>
-            <n-button tertiary round>
+            <n-button strong secondary>
               第4集
             </n-button>
 
           </n-space>
         </n-tab-pane>
         <n-tab-pane name="chap3" tab="线路3">
-          <n-space justify="space-between">
-            <n-button tertiary round>
+          <n-space justify="end">
+            <n-button strong secondary>
               第1集
             </n-button>
-            <n-button tertiary round>
+            <n-button strong secondary>
               第2集
             </n-button>
-            <n-button tertiary round>
+            <n-button strong secondary>
               第3集
             </n-button>
-            <n-button tertiary round>
+            <n-button strong secondary>
               第4集
             </n-button>
 
@@ -358,7 +358,7 @@ onMounted(() => {
 }
 
 .center_layout {
-  width: 60%;
+  width: 78%;
   height: 100%;
   float: right;
   padding: 10px;
@@ -366,7 +366,7 @@ onMounted(() => {
 }
 
 .right_layout {
-  width: 20%;
+  width: 22%;
   height: 100%;
   float: right;
   padding: 10px;

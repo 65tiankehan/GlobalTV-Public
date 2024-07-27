@@ -22,7 +22,9 @@ export default createStore({
       PaginationUrl: '',
       notices: [] as Notice[],//通知消息
       showUpdate: false,
-      videoDetailsLoading: ''//视频详情加载url，这个一发生变化，就弹开详情窗口，进入详情加载
+      videoDetailsLoading: '',//视频详情加载url，这个一发生变化，就弹开详情窗口，进入详情加载
+      PlayStarted: false,//播放开始
+      StreamSource: '',//视频源
     }
   },
   getters: {
@@ -70,7 +72,13 @@ export default createStore({
     },
     getVideoDetailsLoading: (state) => {
       return state.videoDetailsLoading
-    }
+    },
+    getPlayStarted: (state) => {
+      return state.PlayStarted
+    },
+    getStreamSource: (state) => {
+      return state.StreamSource
+    },
 
   },
   mutations: {
@@ -118,6 +126,12 @@ export default createStore({
     },
     SET_VIDEODETAILSLOADING: (state, payload) => {
       state.videoDetailsLoading = payload
-    }
+    },
+    SET_PLAYSTARTED: (state, payload) => {
+      state.PlayStarted = payload
+    },
+    SET_STREAMSOURCE: (state, payload) => {
+      state.StreamSource = payload
+    },
   }
 })

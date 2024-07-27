@@ -60,6 +60,17 @@ const dramaDetails = ref<tvDrama>({
   streamingSources: []
 })
 
+// 重置 dramaDetails 的函数
+function resetDramaDetails() {
+  dramaDetails.value = {
+    title: '',
+    imgUrl: '',
+    tags: [],
+    Scenario: '',
+    streamingSources: []
+  }
+}
+
 const showModel = ref(false)
 const store = useStore()
 // 使用computed属性来访问getter
@@ -91,6 +102,10 @@ const showUpdate = computed(() => store.getters.getShowUpdate)
 // 使用computed属性来访问getter
 const notices = computed(() => store.getters.getNotices)
 
+// 使用computed属性来访问getter
+const PlayStarted = computed(() => store.getters.getPlayStarted)
+
+
 // 使用store.commit来调用mutation
 const setplayVideoType = (url: string) => {
   store.commit('SET_PAYVIDEOTYPE', url)
@@ -109,6 +124,18 @@ const setshowUpdate = (showUpdate: boolean) => {
 const setNotices = (notices: Notice[]) => {
   store.commit('SET_NOTICES', notices)
 }
+
+// 使用store.commit来调用mutation
+const setPlayStarted = (PlayStarted: boolean) => {
+  store.commit('SET_PLAYSTARTED', PlayStarted)
+}
+
+
+// 使用store.commit来调用mutation
+const setStreamSource = (StreamSource: string) => {
+  store.commit('SET_STREAMSOURCE', StreamSource)
+}
+
 
 //发生了分页行为
 const pagination = (page: number) => {
@@ -152,14 +179,14 @@ function getRandomType(): 'default' | 'primary' | 'info' | 'success' | 'warning'
 //监听是否需要展开详情
 watch(videoDetailsLoading, (newVal, oldVal) => {
   console.log('videoDetailsLoading changed from', oldVal, 'to', newVal)
-
+  resetDramaDetails()
   axios
     .get(payVideoUrl.value.slice(0, payVideoUrl.value.length - 1) + extractBeforeDollarBrace(newVal))
     .then((resp) => {
       const $ = cheerio.load(resp.data)
-      console.log('详情')
 
-      let tagLength = $($('div.video-info').children('div.video-info-main')).children('div.video-info-items').length
+
+      const tagLength = $($('div.video-info').children('div.video-info-main')).children('div.video-info-items').length
       //得到详情和tag
       $($('div.video-info').children('div.video-info-main')).children('div.video-info-items').each(function(n, m) {
         console.log('第' + (n + 1) + '条')
@@ -184,7 +211,37 @@ watch(videoDetailsLoading, (newVal, oldVal) => {
 
       dramaDetails.value.imgUrl = $($($('div.video-cover').children('div.module-item-cover')).children('div.module-item-pic')).children('img').attr('data-src')
 
+      //得到线路
+      $($($($($('div.module').children('div.module-heading')).children('div.module-tab')).children('div.module-tab-items')).children('div.module-tab-content')).children('div.module-tab-item').each(function(n, m) {
+        console.log('线路第' + (n + 1) + '条')
 
+        if (dramaDetails.value.streamingSources) {
+          dramaDetails.value.streamingSources.push({
+            name: $(m).children('span').text(),
+            EpisodeCollection: []
+          })
+        }
+
+      })
+      //得到选集
+      $($('div.module').children('div.module-list')).each(function(n, m) {
+        console.log('线路选集盒第' + (n + 1) + '条')
+        $($($(m).children('div.module-blocklist')).children('div.scroll-content')).children('a').each(function(i, b) {
+          console.log('集第' + (i + 1) + '条')
+          if (dramaDetails.value.streamingSources) {
+
+            dramaDetails.value.streamingSources[n].EpisodeCollection.push({
+              title: $($(b).children('span')).text(),
+              url: $(b).attr('href')
+            })
+          }
+
+
+        })
+
+      })
+
+      console.log(dramaDetails.value.streamingSources)
       //当上方数据加载完成后，展开窗口
       showModel.value = true
     }).catch((err) => {
@@ -192,13 +249,28 @@ watch(videoDetailsLoading, (newVal, oldVal) => {
   })
 
 })
+
+
+//点击集，播放
+const PlayBack = (url: string) => {
+  if (url != '') {
+    showModel.value = false
+    // 获取当前时间的时间戳
+    const timestamp = Date.now()
+    setPlayStarted(true)
+    //填写播放地址
+    setStreamSource(url + '${' + `${timestamp}`
+    )
+
+  }
+}
 </script>
 
 <template>
   <div style="height: 100%; width: 100%">
     <Taskbar />
     <!-- home -->
-    <div style="width: 100%; height: 100%" v-show="true">
+    <div style="width: 100%; height: 100%" v-show="PlayStarted == false">
       <div class="left_layout" style="padding-top: 39px">
         <OptionList />
       </div>
@@ -235,7 +307,8 @@ watch(videoDetailsLoading, (newVal, oldVal) => {
         <TVDramaCanvas />
       </div>
     </div>
-    <div style="width: 100%; height: 100%" v-if="false">
+    <!--    播放页面-->
+    <div style="width: 100%; height: 100%" v-if="PlayStarted == true">
       <div style="padding-top: 39px; height: 100%; width: 100%">
         <Play />
       </div>
@@ -353,7 +426,8 @@ watch(videoDetailsLoading, (newVal, oldVal) => {
                           :tab="item.name">
                 <div style="width: 100%;height: 250px" class="NeworldscroE">
                   <n-space>
-                    <n-button strong secondary style="width: 71px;" v-for="(item2,index2) in item.EpisodeCollection "
+                    <n-button @click="PlayBack(item2.url)" strong secondary
+                              v-for="(item2,index2) in item.EpisodeCollection "
                               :key="index2">
                       {{ item2.title }}
                     </n-button>

@@ -2,6 +2,7 @@
 import { useDialog, useMessage, useNotification, useLoadingBar } from 'naive-ui'
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
+import { ArrowUndoOutline as CashIcon } from '@vicons/ionicons5'
 
 const loadingBar = useLoadingBar()
 const message = useMessage()
@@ -13,6 +14,9 @@ const store = useStore()
 const notices = computed(() => store.getters.getNotices)
 // 使用computed属性来访问getter
 const showUpdate = computed(() => store.getters.getShowUpdate)
+
+// 使用computed属性来访问getter
+const PlayStarted = computed(() => store.getters.getPlayStarted)
 
 const ipcHandleMax = () => window.electron.ipcRenderer.send('MaxWin')
 const ipcHandleMin = () => window.electron.ipcRenderer.send('MinWin')
@@ -47,6 +51,11 @@ const setNotices = (notices: Notice[]) => {
 // 使用store.commit来调用mutation
 const setshowUpdate = (showUpdate: boolean) => {
   store.commit('SET_SHOWUPDATE', showUpdate)
+}
+
+// 使用store.commit来调用mutation
+const setPlayStarted = (PlayStarted: boolean) => {
+  store.commit('SET_PLAYSTARTED', PlayStarted)
 }
 
 const threadFun = (value: string) => {
@@ -129,7 +138,7 @@ async function checkForUpdates() {
         align-items: center;
       ">
       <div style="flex: 20%" class="titleName">
-        <div class="iconTitle">
+        <div v-show="!PlayStarted" class="iconTitle">
           <svg t="1710920816744" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
                p-id="6493" width="18" height="18">
             <path
@@ -174,7 +183,16 @@ async function checkForUpdates() {
               fill="#6C0000" p-id="6507"></path>
           </svg>
         </div>
-        <div class="titleText">Global TV</div>
+        <div v-show="!PlayStarted" class="titleText">Global TV</div>
+        <div v-show="PlayStarted">
+          <n-button dashed circle ghost round style="  -webkit-app-region: no-drag;" size="small" @click="setPlayStarted(false)">
+            <template #icon>
+              <n-icon>
+                <CashIcon />
+              </n-icon>
+            </template>
+          </n-button>
+        </div>
       </div>
       <div style="
           flex: 60%;

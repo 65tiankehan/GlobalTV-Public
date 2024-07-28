@@ -5,6 +5,41 @@ import Player from 'nplayer'
 import Hls from 'hls.js'
 
 
+// import axios from 'axios'
+// import * as cheerio from 'cheerio'
+
+
+//定义线路
+interface EpisodeCollection {
+  title?: string,
+  url?: string
+}
+
+//定义线路集合接口
+interface StreamingSources {
+  name?: string,
+  EpisodeCollection: EpisodeCollection[]
+}
+
+
+const props = defineProps({
+  myPropTitle: String,
+  streamingSource: { type: Array as () => StreamingSources[], default: () => [] }
+})
+
+
+const loadSource = ''
+
+
+//
+// function extractBeforeDollarBrace(str: string): string {
+//   const index = str.indexOf('${')
+//   if (index !== -1) {
+//     return str.slice(0, index)
+//   }
+//   return str // 如果没有找到 '${'，返回原始字符串
+// }
+
 const hls = new Hls()
 const player = new Player({
   themeColor: 'rgba(35,173,229, 1)',
@@ -17,13 +52,19 @@ const player = new Player({
 hls.attachMedia(player.video)
 
 hls.on(Hls.Events.MEDIA_ATTACHED, function() {
-  hls.loadSource('https://v.cdnlz19.com/20240604/35808_cea2bd20/index.m3u8')
+  hls.loadSource(loadSource)
 })
 
 const myDiv = ref<HTMLElement | string | undefined>()
+
+
+//
 onMounted(() => {
+
   player.mount(myDiv.value)
 })
+
+
 </script>
 
 <template>
@@ -208,60 +249,19 @@ onMounted(() => {
       "
     >
       <n-h3 style="text-align: center">
-        潘多拉第一季
+        {{ props.myPropTitle }}
       </n-h3>
-      <n-tabs type="bar" animated placement="right">
-        <n-tab-pane name="chap1" tab="线路1">
-          <n-space justify="end">
-            <n-button strong secondary>
-              第1集
-            </n-button>
-            <n-button strong secondary>
-              第2集
-            </n-button>
-            <n-button strong secondary>
-              第3集
-            </n-button>
-            <n-button strong secondary>
-              第4集
-            </n-button>
-
-          </n-space>
-
-        </n-tab-pane>
-        <n-tab-pane name="chap2" tab="线路2">
-          <n-space justify="end">
-            <n-button strong secondary>
-              第1集
-            </n-button>
-            <n-button strong secondary>
-              第2集
-            </n-button>
-            <n-button strong secondary>
-              第3集
-            </n-button>
-            <n-button strong secondary>
-              第4集
-            </n-button>
-
-          </n-space>
-        </n-tab-pane>
-        <n-tab-pane name="chap3" tab="线路3">
-          <n-space justify="end">
-            <n-button strong secondary>
-              第1集
-            </n-button>
-            <n-button strong secondary>
-              第2集
-            </n-button>
-            <n-button strong secondary>
-              第3集
-            </n-button>
-            <n-button strong secondary>
-              第4集
-            </n-button>
-
-          </n-space>
+      <n-tabs type="bar" animated placement="right" style="height: 95%;">
+        <n-tab-pane v-for="(item, index) in props.streamingSource" :key="index" :name="item.name"
+                    :tab="item.name" style="height: 99%;">
+          <div class="NeworldscroE">
+            <n-space style="flex-grow: 1;" justify="end">
+              <n-button strong secondary v-for="(item2, index2) in item.EpisodeCollection"
+                        :key="index2">
+                {{ item2.title }}
+              </n-button>
+            </n-space>
+          </div>
         </n-tab-pane>
       </n-tabs>
     </div>
@@ -277,6 +277,32 @@ onMounted(() => {
 </template>
 
 <style scoped>
+
+.NeworldscroE {
+
+  width: 100%;
+  height: 99%; /* 添加显式高度 */
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    width: 0px; /* Chrome, Safari */
+  }
+}
+
+.NeworldscroE::-webkit-scrollbar-thumb {
+  /*滚动条里面小方块*/
+  border-radius: 0px;
+  -webkit-box-shadow: inset 0 0 5px rgba(235, 238, 240, 0.2);
+  background: #ebeef0;
+}
+
+.NeworldscroE::-webkit-scrollbar-track {
+  /*滚动条里面轨道*/
+  -webkit-box-shadow: inset 0 0 5px rgba(235, 238, 240, 0.2);
+  border-radius: 0px;
+  background: #f1f6fa;
+}
+
 .carousel-img {
   width: 100%;
   height: 200px;

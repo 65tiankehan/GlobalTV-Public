@@ -252,15 +252,17 @@ watch(videoDetailsLoading, (newVal, oldVal) => {
 
 
 //点击集，播放
-const PlayBack = (url: string) => {
+const PlayBack = (url: string | undefined) => {
   if (url != '') {
     showModel.value = false
     // 获取当前时间的时间戳
     const timestamp = Date.now()
-    setPlayStarted(true)
-    //填写播放地址
     setStreamSource(url + '${' + `${timestamp}`
     )
+
+    setPlayStarted(true)
+    //填写播放地址
+
 
   }
 }
@@ -310,7 +312,7 @@ const PlayBack = (url: string) => {
     <!--    播放页面-->
     <div style="width: 100%; height: 100%" v-if="PlayStarted == true">
       <div style="padding-top: 39px; height: 100%; width: 100%">
-        <Play />
+        <Play v-if="PlayStarted" :streamingSource="dramaDetails.streamingSources" :my-prop-title="dramaDetails.title" />
       </div>
     </div>
   </div>

@@ -253,18 +253,14 @@ watch(videoDetailsLoading, (newVal, oldVal) => {
 
 //点击集，播放
 const PlayBack = (url: string | undefined) => {
-  if (url != '') {
-    showModel.value = false
-    // 获取当前时间的时间戳
-    const timestamp = Date.now()
-    setStreamSource(url + '${' + `${timestamp}`
-    )
+  showModel.value = false
+  // 获取当前时间的时间戳
+  const timestamp = Date.now()
+  setStreamSource(url + '${' + `${timestamp}`
+  )
 
-    setPlayStarted(true)
-    //填写播放地址
-
-
-  }
+  setPlayStarted(true)
+  //填写播放地址
 }
 </script>
 

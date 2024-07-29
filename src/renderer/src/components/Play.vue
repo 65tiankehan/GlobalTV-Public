@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { BagAdd as Easel, Happy as Happy, LogoMarkdown as LogoMarkdown } from '@vicons/ionicons5'
 import Player from 'nplayer'
 import Hls from 'hls.js'
+import { useStore } from 'vuex'
 
 
-// import axios from 'axios'
-// import * as cheerio from 'cheerio'
+import axios from 'axios'
+import * as cheerio from 'cheerio'
 
 
 //定义线路
@@ -21,6 +22,13 @@ interface StreamingSources {
   EpisodeCollection: EpisodeCollection[]
 }
 
+const store = useStore()
+
+// 使用computed属性来访问getter
+const payVideoUrl = computed(() => store.getters.getPayVideoUrl)
+// 使用computed属性来访问getter
+const StreamSource = computed(() => store.getters.getStreamSource)
+
 
 const props = defineProps({
   myPropTitle: String,
@@ -28,17 +36,16 @@ const props = defineProps({
 })
 
 
-const loadSource = ''
+const loadSource = ref('')
 
 
-//
-// function extractBeforeDollarBrace(str: string): string {
-//   const index = str.indexOf('${')
-//   if (index !== -1) {
-//     return str.slice(0, index)
-//   }
-//   return str // 如果没有找到 '${'，返回原始字符串
-// }
+function extractBeforeDollarBrace(str: string): string {
+  const index = str.indexOf('${')
+  if (index !== -1) {
+    return str.slice(0, index)
+  }
+  return str // 如果没有找到 '${'，返回原始字符串
+}
 
 const hls = new Hls()
 const player = new Player({
@@ -52,17 +59,41 @@ const player = new Player({
 hls.attachMedia(player.video)
 
 hls.on(Hls.Events.MEDIA_ATTACHED, function() {
-  hls.loadSource(loadSource)
+  hls.loadSource(loadSource.value)
 })
 
 const myDiv = ref<HTMLElement | string | undefined>()
 
 
 //
-onMounted(() => {
 
-  player.mount(myDiv.value)
-})
+onMounted(() => {
+  axios.get(payVideoUrl.value.slice(0, payVideoUrl.value.length - 1) + extractBeforeDollarBrace(StreamSource.value))
+    .then((resp) => {
+      const $ = cheerio.load(resp.data);
+      $('a').each(function(n, m) {
+        console.log('第' + (n + 1) + '条');
+        if ('bfurl' === $(m).attr('id')) {
+          loadSource.value = $(m).attr('href') ?? '';
+          hls.loadSource(loadSource.value);
+          hls.attachMedia(player.video);
+
+          // 监听HLS加载完成事件
+          hls.on(Hls.Events.MANIFEST_PARSED, function() {
+            // 视频加载完成后，等待用户交互再播放
+            player.play();
+          });
+        } else {
+          return;
+        }
+      });
+
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  player.mount(myDiv.value);
+});
 
 
 </script>
@@ -284,6 +315,7 @@ onMounted(() => {
   height: 99%; /* 添加显式高度 */
   overflow-y: auto;
   scrollbar-width: none; /* Firefox */
+
   &::-webkit-scrollbar {
     width: 0px; /* Chrome, Safari */
   }

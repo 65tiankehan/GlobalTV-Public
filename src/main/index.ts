@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, Tray, Menu, autoUpdater } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Tray, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -6,6 +6,7 @@ import icon from '../../resources/icon.png?asset'
 import openIcon from '../../resources/open.png?asset'
 import closeIcon from '../../resources/close.png?asset'
 import updateIcon from '../../resources/update.png?asset'
+import { autoUpdater } from 'electron-updater'
 
 let tray: Tray | null = null
 
@@ -96,11 +97,6 @@ function createWindow(): void {
     shell.openExternal(arg)
   })
 
-  //执行更新
-  ipcMain.on('check-for-update', () => {
-    checkForUpdates()
-  })
-
 
   ipcMain.on('version-request', (event) => {
     event.reply('version-response', app.getVersion())
@@ -109,27 +105,6 @@ function createWindow(): void {
   createTray(mainWindow)
 }
 
-// 替换为你的更新配置文件URL
-// 初始化 autoUpdater
-autoUpdater.setFeedURL({ url: 'https://your-repo-url.com/latest.yml' })
-
-// 更新事件监听
-autoUpdater.on('update-available', () => {
-  console.log('Update available.')
-})
-
-autoUpdater.on('update-not-available', () => {
-  console.log('Update not available.')
-})
-
-
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
-
-function checkForUpdates() {
-  autoUpdater.checkForUpdates()
-}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -154,6 +129,46 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+
+  // 监听渲染进程的更新检查请求
+  ipcMain.on('check-for-update', () => {
+    // 开始检查更新
+    autoUpdater.checkForUpdates()
+  })
+
+  // 设置自动更新监听器
+  autoUpdater.on('checking-for-update', () => {
+    console.log('Checking for update...')
+  })
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('Update available:', info.version)
+  })
+
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('Update not available:', info.version)
+  })
+
+  autoUpdater.on('error', (err) => {
+    console.error('Error in auto-updater:', err)
+  })
+
+  autoUpdater.on('download-progress', (progressObj) => {
+    let logMessage = 'Download speed: ' + progressObj.bytesPerSecond
+    logMessage = logMessage + ' - Downloaded ' + progressObj.percent + '%'
+    logMessage = logMessage + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
+    console.log(logMessage)
+  })
+
+
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('Update downloaded:', info.version)
+    // 通知渲染进程更新已下载
+    BrowserWindow.getAllWindows().forEach((win) => {
+      win.webContents.send('update-downloaded', info)
+    })
+    autoUpdater.quitAndInstall()
   })
 })
 

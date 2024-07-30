@@ -1,0 +1,1 @@
+   start cmd /k "cd /d %~dp0 && npm run build && electron-builder --win"

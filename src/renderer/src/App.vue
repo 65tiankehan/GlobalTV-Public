@@ -7,14 +7,17 @@
  * @LastEditors: KeHan
 -->
 <script setup lang="ts">
-import { darkTheme } from 'naive-ui'
-// import Versions from './components/Versions.vue'
 
-// const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+import { darkTheme } from 'naive-ui'
+
+
 </script>
 
+
 <template>
-  <n-config-provider :theme="darkTheme">
+  <n-config-provider
+    :theme="darkTheme"
+  >
     <n-notification-provider :placement="'bottom-right'">
       <n-modal-provider>
         <n-loading-bar-provider>

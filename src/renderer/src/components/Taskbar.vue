@@ -3,6 +3,7 @@ import { useDialog, useMessage, useNotification, useLoadingBar } from 'naive-ui'
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 import { ArrowUndoOutline as CashIcon } from '@vicons/ionicons5'
+import axios from 'axios'
 
 const loadingBar = useLoadingBar()
 const message = useMessage()
@@ -43,6 +44,7 @@ interface Notice {
   message: string
 }
 
+
 // 使用store.commit来调用mutation
 const setNotices = (notices: Notice[]) => {
   store.commit('SET_NOTICES', notices)
@@ -56,6 +58,12 @@ const setshowUpdate = (showUpdate: boolean) => {
 // 使用store.commit来调用mutation
 const setPlayStarted = (PlayStarted: boolean) => {
   store.commit('SET_PLAYSTARTED', PlayStarted)
+}
+
+
+// 使用store.commit来调用mutation
+const setversionDescriptions = (versionDescriptions: string[]) => {
+  store.commit('SET_VERSIONDESCRIPTIONS', versionDescriptions)
 }
 
 const threadFun = (value: string) => {
@@ -111,20 +119,35 @@ async function checkForUpdates() {
   loadingBar.start()
   await sleep(3000) // 等待3秒
 
-  //这个是要去调用主进程去检查
-  // if (window.electron.ipcRenderer.sendSync('checkForUpdates')) {
-  //   message.success('有新版本')
-  //   setshowUpdate(true)
-  // } else {
-  //   message.success('没有新版本')
-  // }
+  axios.get('https://raw.githubusercontent.com/65tiankehan/GlobalTV_profile/main/version.json').then(res => {
+    console.log(res.data.version)
+
+    // 请求版本号
+    window.electron.ipcRenderer.send('version-request')
+    // 监听版本号的响应
+    window.electron.ipcRenderer.on('version-response', (_event, version) => {
+      console.log(`Application version: ${version}`)
+      if (res.data.version !== `${version}`) {
+        message.success('有新版本')
+        setversionDescriptions(res.data.versionDescription)
+        setshowUpdate(!showUpdate.value)
+      } else {
+        message.success('没有新版本')
+      }
+    })
+
+  }).catch((err) => {
+    console.log(err)
+  })
+
   loadingBar.finish()
-  message.success('有新版本')
-  setshowUpdate(!showUpdate.value)
 
 }
 
-
+//打开up主关注页面
+const openUp = () => {
+  window.electron.ipcRenderer.send('OpenExternal', 'https://space.bilibili.com/393402835/video')
+}
 </script>
 
 <template>
@@ -185,7 +208,8 @@ async function checkForUpdates() {
         </div>
         <div v-show="!PlayStarted" class="titleText">Global TV</div>
         <div v-show="PlayStarted">
-          <n-button dashed circle ghost round style="  -webkit-app-region: no-drag;" size="small" @click="setPlayStarted(false)">
+          <n-button dashed circle ghost round style="  -webkit-app-region: no-drag;" size="small"
+                    @click="setPlayStarted(false)">
             <template #icon>
               <n-icon>
                 <CashIcon />
@@ -344,7 +368,7 @@ async function checkForUpdates() {
                      style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>UP主：盛为梦-Azure</span>
-                    <n-button size="tiny">关注</n-button>
+                    <n-button size="tiny" @click="openUp">关注</n-button>
                   </div>
                 </div>
               </div>
@@ -353,7 +377,7 @@ async function checkForUpdates() {
                      style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>粉丝</span>
-                    <n-button size="tiny">200+</n-button>
+                    <n-button size="tiny" @click="openUp">200+</n-button>
                   </div>
                 </div>
               </div>
@@ -362,7 +386,7 @@ async function checkForUpdates() {
                      style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>动态</span>
-                    <n-button size="tiny">100+</n-button>
+                    <n-button size="tiny" @click="openUp">100+</n-button>
                   </div>
                 </div>
               </div>

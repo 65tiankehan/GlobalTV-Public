@@ -7,12 +7,20 @@
  * @LastEditors: KeHan
  */
 import './assets/main.css'
-
 import { createApp } from 'vue'
 import App from './App.vue'
 import naive from 'naive-ui'
 import 'animate.css'
 import store from '../src/store'
 import router from '../src/router/index'
+import { toggleTheme } from './themeToggle' // 确保这个路径正确
 
-createApp(App).use(naive).use(store).use(router).mount('#app')
+const app = createApp(App)
+app.use(naive)
+app.use(store)
+app.use(router)
+
+// 注册toggleTheme到全局
+app.config.globalProperties.$toggleTheme = toggleTheme
+
+app.mount('#app')

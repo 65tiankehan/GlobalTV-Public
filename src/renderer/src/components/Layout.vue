@@ -17,7 +17,7 @@ import Play from './Play.vue'
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onBeforeMount, onUnmounted } from 'vue'
 
 interface Notice {
   title: string,
@@ -104,6 +104,10 @@ const notices = computed(() => store.getters.getNotices)
 
 // 使用computed属性来访问getter
 const PlayStarted = computed(() => store.getters.getPlayStarted)
+
+
+// 使用computed属性来访问getter
+const versionDescriptions = computed(() => store.getters.getVersionDescriptions)
 
 
 // 使用store.commit来调用mutation
@@ -262,6 +266,52 @@ const PlayBack = (url: string | undefined) => {
   setPlayStarted(true)
   //填写播放地址
 }
+
+
+/**
+ *  检查官方消息通知，这个消息通知虽然可以临时被清空，但是每隔一分钟，就重新请求官方消息
+ *  会剔除相同标题的消息，会和原本的消息队列融合
+ *  [
+ *    {
+ *      title:'',
+ *      message
+ *    }
+ *  ]
+ */
+let intervalId: NodeJS.Timeout | null = null
+
+const checkForUpdates = async () => {
+  try {
+    const response = await axios.get('https://raw.githubusercontent.com/65tiankehan/GlobalTV_profile/main/notifications.json')
+    const newNotices: Notice[] = response.data
+
+    const existingTitles = notices.value.map((notice) => notice.title)
+    const filteredNewNotices = newNotices.filter(
+      (notice) => !existingTitles.includes(notice.title)
+    )
+
+
+    if (filteredNewNotices.length > 0) {
+      // 合并现有通知和新通知
+      const mergedNotices = [...notices.value, ...filteredNewNotices]
+
+      // 更新Vuex状态
+      store.commit('SET_NOTICES', mergedNotices)
+    }
+  } catch (error) {
+    console.error('Failed to fetch notices:', error)
+  }
+}
+
+onBeforeMount(() => {
+  intervalId = setInterval(checkForUpdates, 60000) // 每分钟检查一次
+})
+
+onUnmounted(() => {
+  if (intervalId) {
+    clearInterval(intervalId)
+  }
+})
 </script>
 
 <template>
@@ -292,7 +342,8 @@ const PlayBack = (url: string | undefined) => {
 
           </n-breadcrumb>
           <!--  表达排除首页 -->
-          <n-pagination @update:page="pagination" v-if="(playVideoType != '' && playVideoType != payVideoUrl)"
+          <n-pagination :page-slot="7" @update:page="pagination"
+                        v-if="(playVideoType != '' && playVideoType != payVideoUrl)"
                         v-model:page="page"
                         :page-count="total" show-quick-jumper>
 
@@ -334,9 +385,7 @@ const PlayBack = (url: string | undefined) => {
         </n-badge>
       </template>
       <div>
-        <p>1.更新 v0.0.1</p>
-        <p>2.修复 分类在切换的过程中显示错误</p>
-        <p>3.修复下载通知，在下载完毕后，无法有效的通知</p>
+        <p v-for="(item, index) in versionDescriptions" :key="index">{{ item }}</p>
       </div>
       <template #footer>
         <n-space justify="end">

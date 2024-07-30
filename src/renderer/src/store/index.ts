@@ -12,7 +12,7 @@ export default createStore({
       searchUrl: '',
       playAddress1: -1,//这个是一级目录选择值
       playAddress2: -1,//这个是二级目录选择值
-      theme: 'white',
+      theme: 'darkTheme',//lightTheme 亮，darkTheme 暗
       playRoute: 'https://jx.2s0.cn/player/?url=',
       playVideoUrl: 'https://www.yyds.one/',
       playVideoType: '',
@@ -25,6 +25,7 @@ export default createStore({
       videoDetailsLoading: '',//视频详情加载url，这个一发生变化，就弹开详情窗口，进入详情加载
       PlayStarted: false,//播放开始
       StreamSource: '',//视频源
+      versionDescriptions:[]//版本更新内容
     }
   },
   getters: {
@@ -79,6 +80,9 @@ export default createStore({
     getStreamSource: (state) => {
       return state.StreamSource
     },
+    getVersionDescriptions: (state) => {
+      return state.versionDescriptions
+    }
 
   },
   mutations: {
@@ -133,5 +137,8 @@ export default createStore({
     SET_STREAMSOURCE: (state, payload) => {
       state.StreamSource = payload
     },
+    SET_VERSIONDESCRIPTIONS: (state, payload) => {
+      state.versionDescriptions = payload
+    }
   }
 })

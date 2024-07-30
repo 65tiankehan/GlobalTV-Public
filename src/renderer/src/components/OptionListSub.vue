@@ -5,9 +5,21 @@ import { sites, OptionSelects } from '../OptionSelectsSub' // 美剧
 import { AMERICANMOVIES } from '../AmericanMovies'// 美国电影
 import { DOMESTICDRAMA } from '../DomesticDrama'//国产剧
 import { useStore } from 'vuex'
-import { computed, watch } from 'vue'
+import { computed, watch, ref } from 'vue'
+
+import axios from 'axios'
+import * as cheerio from 'cheerio'
+
+interface fetchMiscArticles {
+  title?: string,
+  briefDescription?: string,
+  fullDescription?: string,
+  url?: string
+}
 
 const store = useStore()
+
+const fetchMiscArticlesB = ref<fetchMiscArticles[]>([])
 
 // 使用store.commit来调用mutation
 const setplayVideoType = (url: string) => {
@@ -55,6 +67,29 @@ const groupedByKey = new Map<string, OptionSelects[]>()
 
 let sitesPro: OptionSelects[] = groupedByKey.get(String(playAddress2.value)) || []
 
+const scrapeArticles = () => {
+  axios
+    .get('https://www.bilibili.com/read/home?spm_id_from=333.1007.0.0')
+    .then((resp) => {
+      fetchMiscArticlesB.value = []
+      const $ = cheerio.load(resp.data)
+      $('div.feed').children('div.feed-item').each(function(n, m) {
+        console.log('第' + (n + 1) + '条')
+        fetchMiscArticlesB.value.push(
+          {
+            title: $(m).children('a').attr('title'),
+            briefDescription: $($($($(m).children('a')).children('div.article-item__left')).children('div.article-item__details')).children('div.article-item__desc').text(),
+            url: $(m).children('a').attr('href')
+          }
+        )
+
+      })
+    }).catch((err) => {
+    console.log(err)
+  })
+}
+
+scrapeArticles()
 
 watch(playAddress2, (newVal, oldVal) => {
   console.log('playAddress2 changed from', oldVal, 'to', newVal)
@@ -82,6 +117,11 @@ watch(playAddress2, (newVal, oldVal) => {
   sitesPro = groupedByKey.get(String(playAddress2.value)) || []
 
 
+  //进入文章列表，抓取最新文章
+  if (sitesPro.length <= 0 || -1 == playAddress2.value) {
+    scrapeArticles()
+  }
+
 })
 
 
@@ -92,6 +132,12 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], page: number
   setpage(page)
   settotal(total)
   setPaginationUrl(PaginationUrl)
+}
+
+//打开文章
+const openArticle = (url: string | undefined) => {
+  //使用electron 的shell
+  window.electron.ipcRenderer.send('OpenExternal', 'https:' + url)
 }
 </script>
 
@@ -155,34 +201,71 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], page: number
           </div>
         </div>
         <n-space vertical v-show="sitesPro.length <= 0">
-          <n-card title="🙌静谧时光里的自我关怀" embedded :bordered="false">
-            在这个快节奏的世界里，别忘了给自己一些温柔的时刻。就像一杯慢慢泡开的茶，生活的美好往往需要时间来沉淀。无论今天你经历了什么，请记得停下来，深呼吸，感受这一刻的宁静与美好。你是独一无二的，你的存在本身就是这个世界最宝贵的礼物之一。所以，请善待自己，因为你值得所有的爱与温暖。
-          </n-card>
-          <n-card title="😊 晨光微曦" embedded :bordered="false">
-            在这繁忙的世界中，给自己一个微笑的理由。每一天都是新的开始，每一个早晨都充满了无限可能。就像初升的太阳，驱散夜的黑暗，让新的一天充满光明与希望。记住，无论昨天如何，今天是属于你的，去拥抱它吧！
-          </n-card>
-          <n-card title="🥬 心灵绿洲" embedded :bordered="false">
-            在忙碌的生活之余，不妨给自己一片心灵的绿洲。在那里，你可以放松心情，聆听内心的声音。不要让外界的喧嚣打扰了内心的平静，因为真正的力量来自于内心的宁静与坚定。
-          </n-card>
-          <n-card title="📖 岁月如歌" embedded :bordered="false">
-            生活就像一首歌，有高潮也有低谷。但正是这些起伏，构成了我们丰富多彩的人生。不要害怕挑战，每一次经历都是成长的机会。珍惜每一刻，因为它们都是组成你生命乐章的音符。
+          <n-card v-for="(item, index) in fetchMiscArticlesB" :key="index" :title="item.title" embedded
+                  :bordered="false">
+            {{ item.briefDescription }}
+            <template #header-extra>
+              <n-tooltip
+                placement="left"
+                trigger="hover"
+
+              >
+                <template #trigger>
+                  <n-button @click="openArticle(item.url)" strong secondary circle>
+                    <svg t="1722300411261" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="4946" width="20" height="20">
+                      <path
+                        d="M845.824 944.128H186.368c-55.296 0-102.4-47.104-102.4-102.4V325.632c0-57.344 47.104-102.4 102.4-102.4h657.408c57.344 0 102.4 47.104 102.4 102.4v518.144c2.048 55.296-45.056 100.352-100.352 100.352z"
+                        fill="#FDDFDF" p-id="4947"></path>
+                      <path
+                        d="M307.2 88.064l204.8 83.968c63.488 24.576 114.688 98.304 114.688 159.744v499.712c0 63.488-49.152 94.208-114.688 67.584l-204.8-83.968C243.712 790.528 192.512 716.8 192.512 655.36V157.696c0-63.488 51.2-96.256 114.688-69.632z"
+                        fill="#FDDFDF" p-id="4948"></path>
+                      <path
+                        d="M794.624 421.888H243.712c-12.288 0-22.528-8.192-22.528-22.528 0-12.288 8.192-22.528 22.528-22.528h550.912c12.288 0 22.528 12.288 22.528 22.528 0 12.288-12.288 22.528-22.528 22.528z m0 169.984H243.712c-12.288 0-22.528-8.192-22.528-22.528 0-12.288 8.192-22.528 22.528-22.528h550.912c12.288 0 22.528 12.288 22.528 22.528 0 12.288-12.288 22.528-22.528 22.528zM794.624 786.432H243.712c-12.288 0-22.528-8.192-22.528-22.528 0-12.288 8.192-22.528 22.528-22.528h550.912c12.288 0 22.528 12.288 22.528 22.528 0 12.288-12.288 22.528-22.528 22.528z"
+                        fill="#EE9B9B" p-id="4949"></path>
+                    </svg>
+                  </n-button>
+                </template>
+                <span> 阅读文章 </span>
+              </n-tooltip>
+
+            </template>
           </n-card>
         </n-space>
       </div>
       <div v-show="-1 == playAddress2" class="NeworldscroE" style="width: 100%; height: 100%">
         <n-space vertical>
-          <n-card title="😁站稳脚跟" embedded :bordered="false">
-            在这个充满竞争的世界里，只有坚韧不拔的人才能站稳脚跟。不要畏惧挑战，因为每一次跌倒都是为了更好的站起来。记住，成功往往青睐于那些不轻易放弃的人。
+          <n-card v-for="(item, index) in fetchMiscArticlesB" :key="index" :title="item.title" embedded
+                  :bordered="false">
+            {{ item.briefDescription }}
+            <template #header-extra>
+              <n-tooltip
+                placement="left"
+                trigger="hover"
+
+              >
+                <template #trigger>
+                  <n-button @click="openArticle(item.url)" strong secondary circle>
+                    <svg t="1722300411261" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="4946" width="20" height="20">
+                      <path
+                        d="M845.824 944.128H186.368c-55.296 0-102.4-47.104-102.4-102.4V325.632c0-57.344 47.104-102.4 102.4-102.4h657.408c57.344 0 102.4 47.104 102.4 102.4v518.144c2.048 55.296-45.056 100.352-100.352 100.352z"
+                        fill="#FDDFDF" p-id="4947"></path>
+                      <path
+                        d="M307.2 88.064l204.8 83.968c63.488 24.576 114.688 98.304 114.688 159.744v499.712c0 63.488-49.152 94.208-114.688 67.584l-204.8-83.968C243.712 790.528 192.512 716.8 192.512 655.36V157.696c0-63.488 51.2-96.256 114.688-69.632z"
+                        fill="#FDDFDF" p-id="4948"></path>
+                      <path
+                        d="M794.624 421.888H243.712c-12.288 0-22.528-8.192-22.528-22.528 0-12.288 8.192-22.528 22.528-22.528h550.912c12.288 0 22.528 12.288 22.528 22.528 0 12.288-12.288 22.528-22.528 22.528z m0 169.984H243.712c-12.288 0-22.528-8.192-22.528-22.528 0-12.288 8.192-22.528 22.528-22.528h550.912c12.288 0 22.528 12.288 22.528 22.528 0 12.288-12.288 22.528-22.528 22.528zM794.624 786.432H243.712c-12.288 0-22.528-8.192-22.528-22.528 0-12.288 8.192-22.528 22.528-22.528h550.912c12.288 0 22.528 12.288 22.528 22.528 0 12.288-12.288 22.528-22.528 22.528z"
+                        fill="#EE9B9B" p-id="4949"></path>
+                    </svg>
+                  </n-button>
+                </template>
+                <span> 阅读文章 </span>
+              </n-tooltip>
+
+            </template>
           </n-card>
-          <n-card title="📖 年轻的力量" embedded :bordered="false">
-            年轻时的努力，铸就未来的辉煌。不要害怕失败，每一次尝试都是向成功迈进的一步。坚持自己的梦想，用汗水浇灌希望的种子，终将收获属于自己的果实。
-          </n-card>
-          <n-card title="😊 不畏艰难" embedded :bordered="false">
-            人生路上难免会有坎坷，但正是这些困难塑造了我们的性格。勇敢面对挑战，即使路途艰辛也要勇往直前。因为真正的勇士，是在逆境中依然坚持前进的人。
-          </n-card>
-          <n-card title="📖 无畏前行" embedded :bordered="false">
-            不要被过去的错误所束缚，也不要被未来的不确定性所困扰。勇敢地迈出每一步，相信自己的能力。记住，只有不断前进，才能到达理想的彼岸。
-          </n-card>
+
         </n-space>
 
       </div>
@@ -284,5 +367,9 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], page: number
   color: #eaeaea;
   /* border: 1px solid rgb(50, 50, 50); */
   height: 100%;
+}
+
+.n-card.n-card--embedded {
+  background-color: rgb(39, 39, 39);
 }
 </style>

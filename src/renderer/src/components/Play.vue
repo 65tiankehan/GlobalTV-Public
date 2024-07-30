@@ -34,7 +34,10 @@ const props = defineProps({
   myPropTitle: String,
   streamingSource: { type: Array as () => StreamingSources[], default: () => [] }
 })
-
+// 使用store.commit来调用mutation
+const setStreamSource = (StreamSource: string) => {
+  store.commit('SET_STREAMSOURCE', StreamSource)
+}
 
 const loadSource = ref('')
 
@@ -68,33 +71,58 @@ const myDiv = ref<HTMLElement | string | undefined>()
 //
 
 onMounted(() => {
+  prepareForPlayback()
+  player.mount(myDiv.value)
+})
+
+//解析来源，并准备播放
+const prepareForPlayback = () => {
   axios.get(payVideoUrl.value.slice(0, payVideoUrl.value.length - 1) + extractBeforeDollarBrace(StreamSource.value))
     .then((resp) => {
-      const $ = cheerio.load(resp.data);
+      const $ = cheerio.load(resp.data)
       $('a').each(function(n, m) {
-        console.log('第' + (n + 1) + '条');
+        console.log('第' + (n + 1) + '条')
         if ('bfurl' === $(m).attr('id')) {
-          loadSource.value = $(m).attr('href') ?? '';
-          hls.loadSource(loadSource.value);
-          hls.attachMedia(player.video);
+          loadSource.value = $(m).attr('href') ?? ''
+          hls.loadSource(loadSource.value)
+          hls.attachMedia(player.video)
 
           // 监听HLS加载完成事件
           hls.on(Hls.Events.MANIFEST_PARSED, function() {
             // 视频加载完成后，等待用户交互再播放
-            player.play();
-          });
+            player.play()
+          })
         } else {
-          return;
+          return
         }
-      });
+      })
 
     })
     .catch((err) => {
-      console.log(err);
-    });
-  player.mount(myDiv.value);
-});
+      console.log(err)
+    })
+}
 
+//设置来源
+const setMediaSource = (url: string | undefined) => {
+  // 参数校验: 检查url是否为undefined，并根据情况处理
+  if (url === undefined) {
+    console.error('URL is undefined. Cannot set media source.')
+    // 可以在这里添加更多的错误处理逻辑，比如返回一个错误，或者调用错误处理函数
+    return
+  }
+
+  try {
+    // 调用setStreamSource之前，可以添加任何必要的逻辑检查
+    setStreamSource(url)
+    // 准备播放之前，也可以添加任何必要的逻辑检查
+    prepareForPlayback()
+  } catch (error) {
+    // 异常处理: 对于setStreamSource和prepareForPlayback抛出的任何错误，进行处理
+    console.error('An error occurred while setting media source or preparing for playback:', error)
+    // 可以在这里添加任何必要的错误处理逻辑，比如重试逻辑、调用错误处理函数等
+  }
+}
 
 </script>
 
@@ -287,7 +315,8 @@ onMounted(() => {
                     :tab="item.name" style="height: 99%;">
           <div class="NeworldscroE">
             <n-space style="flex-grow: 1;" justify="end">
-              <n-button strong secondary v-for="(item2, index2) in item.EpisodeCollection"
+              <n-button @click="setMediaSource(item2.url)" strong secondary
+                        v-for="(item2, index2) in item.EpisodeCollection"
                         :key="index2">
                 {{ item2.title }}
               </n-button>
@@ -438,5 +467,9 @@ onMounted(() => {
 
 .nplayer_control_bg {
   border-radius: 10px;
+}
+
+.n-tabs {
+  background-color: rgb(39, 39, 39)
 }
 </style>

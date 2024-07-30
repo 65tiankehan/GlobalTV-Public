@@ -1,23 +1,55 @@
-/*
- * @职业: 自由 开发者
- * @Description:
- * @Author: KeHan
- * @Date: 2024-03-19 14:26:28
- * @LastEditTime: 2024-03-21 11:45:38
- * @LastEditors: KeHan
- */
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Tray, Menu, autoUpdater } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+
+import openIcon from '../../resources/open.png?asset'
+import closeIcon from '../../resources/close.png?asset'
+import updateIcon from '../../resources/update.png?asset'
+
+let tray: Tray | null = null
+
+function createTray(mainWindow: BrowserWindow): void {
+  // 创建托盘图标
+  tray = new Tray(icon)
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '打开应用',
+      click: () => {
+        if (!mainWindow.isVisible()) {
+          mainWindow.show()
+        }
+      },
+      icon: openIcon
+    },
+    {
+      label: '关闭应用',
+      click: () => {
+        app.quit()
+      },
+      icon: closeIcon
+    },
+    {
+      label: '版本更新',
+      click: () => {
+        // 实现版本更新的逻辑
+        shell.openExternal('https://space.bilibili.com/393402835?spm_id_from=333.1007.0.0')
+      },
+      icon: updateIcon
+    }
+  ])
+
+  tray.setToolTip('Your App Name')
+  tray.setContextMenu(contextMenu)
+}
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1495,
     height: 888,
-    minWidth:1010,
-    minHeight:667,
+    minWidth: 1010,
+    minHeight: 667,
     show: false,
     frame: false,
     resizable: true,
@@ -59,6 +91,44 @@ function createWindow(): void {
   ipcMain.on('MinWin', () => {
     mainWindow.minimize()
   })
+
+  ipcMain.on('OpenExternal', (_event, arg) => {
+    shell.openExternal(arg)
+  })
+
+  //执行更新
+  ipcMain.on('check-for-update', () => {
+    checkForUpdates()
+  })
+
+
+  ipcMain.on('version-request', (event) => {
+    event.reply('version-response', app.getVersion())
+  })
+  // 创建托盘图标
+  createTray(mainWindow)
+}
+
+// 替换为你的更新配置文件URL
+// 初始化 autoUpdater
+autoUpdater.setFeedURL({ url: 'https://your-repo-url.com/latest.yml' })
+
+// 更新事件监听
+autoUpdater.on('update-available', () => {
+  console.log('Update available.')
+})
+
+autoUpdater.on('update-not-available', () => {
+  console.log('Update not available.')
+})
+
+
+autoUpdater.on('update-downloaded', () => {
+  autoUpdater.quitAndInstall()
+})
+
+function checkForUpdates() {
+  autoUpdater.checkForUpdates()
 }
 
 // This method will be called when Electron has finished
@@ -80,7 +150,7 @@ app.whenReady().then(() => {
 
   createWindow()
 
-  app.on('activate', function () {
+  app.on('activate', function() {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

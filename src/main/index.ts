@@ -44,6 +44,8 @@ function createTray(mainWindow: BrowserWindow): void {
   tray.setContextMenu(contextMenu)
 }
 
+
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -93,16 +95,79 @@ function createWindow(): void {
     mainWindow.minimize()
   })
 
+
   ipcMain.on('OpenExternal', (_event, arg) => {
     shell.openExternal(arg)
   })
 
+  // 创建托盘图标
+  createTray(mainWindow)
 
+
+  //这个得到版本，但不参与任何的版本事件
+  ipcMain.on('version-request-Y', (event) => {
+    event.reply('version-response-Y', app.getVersion())
+  })
+
+  //这个得到版本，会参与任何的版本事件
   ipcMain.on('version-request', (event) => {
     event.reply('version-response', app.getVersion())
   })
-  // 创建托盘图标
-  createTray(mainWindow)
+
+  // 监听渲染进程的更新检查请求
+  ipcMain.on('check-for-update', () => {
+    // 开始检查更新
+    autoUpdater.checkForUpdates()
+  })
+
+  //监听渲染进程的更新确认
+  ipcMain.on('check-for-update-yes', () => {
+    // 开始检查更新
+    autoUpdater.quitAndInstall()
+  })
+  // 设置自动更新监听器
+  autoUpdater.on('checking-for-update', () => {
+    console.log('Checking for update...')
+  })
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('Update available:', info.version)
+  })
+
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('Update not available:', info.version)
+  })
+
+  autoUpdater.on('error', (err) => {
+    console.error('Error in auto-updater:', err)
+    //通知渲染线程，更新失败
+    BrowserWindow.getAllWindows().forEach((win) => {
+      win.webContents.send('update-downloaded-err', err)
+    })
+  })
+
+  autoUpdater.on('download-progress', (progressObj) => {
+    let logMessage = 'Download speed: ' + progressObj.bytesPerSecond
+    logMessage = logMessage + ' - Downloaded ' + progressObj.percent + '%'
+    logMessage = logMessage + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
+    console.log(logMessage)
+
+    //通知渲染线程，更新进度
+    BrowserWindow.getAllWindows().forEach((win) => {
+      win.webContents.send('download-progress-r', `当前进度: (${progressObj.transferred} / ${progressObj.total}) 下载速度: ${progressObj.bytesPerSecond}`
+    )
+    })
+  })
+
+
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('Update downloaded:', info.version)
+    // 通知渲染进程更新已下载
+    BrowserWindow.getAllWindows().forEach((win) => {
+      win.webContents.send('update-downloaded', info)
+    })
+
+  })
 }
 
 
@@ -131,45 +196,7 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
-  // 监听渲染进程的更新检查请求
-  ipcMain.on('check-for-update', () => {
-    // 开始检查更新
-    autoUpdater.checkForUpdates()
-  })
 
-  // 设置自动更新监听器
-  autoUpdater.on('checking-for-update', () => {
-    console.log('Checking for update...')
-  })
-
-  autoUpdater.on('update-available', (info) => {
-    console.log('Update available:', info.version)
-  })
-
-  autoUpdater.on('update-not-available', (info) => {
-    console.log('Update not available:', info.version)
-  })
-
-  autoUpdater.on('error', (err) => {
-    console.error('Error in auto-updater:', err)
-  })
-
-  autoUpdater.on('download-progress', (progressObj) => {
-    let logMessage = 'Download speed: ' + progressObj.bytesPerSecond
-    logMessage = logMessage + ' - Downloaded ' + progressObj.percent + '%'
-    logMessage = logMessage + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
-    console.log(logMessage)
-  })
-
-
-  autoUpdater.on('update-downloaded', (info) => {
-    console.log('Update downloaded:', info.version)
-    // 通知渲染进程更新已下载
-    BrowserWindow.getAllWindows().forEach((win) => {
-      win.webContents.send('update-downloaded', info)
-    })
-    autoUpdater.quitAndInstall()
-  })
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

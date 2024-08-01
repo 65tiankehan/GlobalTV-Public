@@ -5,7 +5,7 @@ import { sites, OptionSelects } from '../OptionSelectsSub' // 美剧
 import { AMERICANMOVIES } from '../AmericanMovies'// 美国电影
 import { DOMESTICDRAMA } from '../DomesticDrama'//国产剧
 import { useStore } from 'vuex'
-import { computed, watch, ref } from 'vue'
+import { computed, watch, ref, onBeforeMount, onUnmounted } from 'vue'
 
 import axios from 'axios'
 import * as cheerio from 'cheerio'
@@ -91,6 +91,7 @@ const scrapeArticles = () => {
 
 scrapeArticles()
 
+
 watch(playAddress2, (newVal, oldVal) => {
   console.log('playAddress2 changed from', oldVal, 'to', newVal)
 
@@ -139,6 +140,43 @@ const openArticle = (url: string | undefined) => {
   //使用electron 的shell
   window.electron.ipcRenderer.send('OpenExternal', 'https:' + url)
 }
+
+
+//插入一些来自官方的广告，每隔离2分钟查询一次广告
+
+let intervalId: NodeJS.Timeout | null = null
+
+const hasOfficialAds = async () => {
+  try {
+    const response = await axios.get('https://raw.githubusercontent.com/65tiankehan/GlobalTV_profile/main/advertisement.json')
+    const newfetchMiscArticles: fetchMiscArticles[] = response.data
+
+    const existingTitles = fetchMiscArticlesB.value.map((notice) => notice.title)
+    const filteredNewfetchMiscArticlesB = newfetchMiscArticles.filter(
+      (notice) => !existingTitles.includes(notice.title)
+    )
+
+
+    if (filteredNewfetchMiscArticlesB.length > 0) {
+      // 合并现有文章，往文章列表插入，广告，在前面
+      const mergedfetchMiscArticlesB = [...filteredNewfetchMiscArticlesB, ...fetchMiscArticlesB.value]
+      fetchMiscArticlesB.value = mergedfetchMiscArticlesB
+
+    }
+  } catch (error) {
+    console.error('Failed to fetch fetchMiscArticles:', error)
+  }
+}
+onBeforeMount(() => {
+  intervalId = setInterval(hasOfficialAds, 120000) // 每2分钟检查一次
+})
+
+onUnmounted(() => {
+  if (intervalId) {
+    clearInterval(intervalId)
+  }
+})
+
 </script>
 
 <template>

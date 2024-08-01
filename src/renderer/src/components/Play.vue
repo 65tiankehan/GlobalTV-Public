@@ -29,6 +29,12 @@ const payVideoUrl = computed(() => store.getters.getPayVideoUrl)
 // 使用computed属性来访问getter
 const StreamSource = computed(() => store.getters.getStreamSource)
 
+// 使用computed属性来访问getter
+const localPlayUrl = computed(() => store.getters.getLocalPlayUrl)
+
+// 使用computed属性来访问getter
+const mimeType = computed(() => store.getters.getMimeType)
+
 
 const props = defineProps({
   myPropTitle: String,
@@ -71,7 +77,12 @@ const myDiv = ref<HTMLElement | string | undefined>()
 //
 
 onMounted(() => {
-  prepareForPlayback()
+  if (localPlayUrl.value.length > 0) {
+    preparelocalPlayUrl()
+  } else {
+    prepareForPlayback()
+  }
+
   player.mount(myDiv.value)
 })
 
@@ -121,6 +132,32 @@ const setMediaSource = (url: string | undefined) => {
     // 异常处理: 对于setStreamSource和prepareForPlayback抛出的任何错误，进行处理
     console.error('An error occurred while setting media source or preparing for playback:', error)
     // 可以在这里添加任何必要的错误处理逻辑，比如重试逻辑、调用错误处理函数等
+  }
+}
+
+//准备本地播放
+const preparelocalPlayUrl = () => {
+  if (localPlayUrl.value) {
+    loadSource.value = localPlayUrl.value
+    console.log('类型')
+    console.log(mimeType.value)
+    // 根据 MIME 类型决定是否使用 HLS
+    if (mimeType.value.startsWith('application/x-mpegURL') || mimeType.value.startsWith('application/vnd.apple.mpegurl')) {
+      // 如果 MIME 类型表明这是一个 HLS 流，则使用 HLS 解析器
+      hls.loadSource(loadSource.value)
+      // 移除之前的事件处理器
+      hls.off(Hls.Events.MANIFEST_PARSED)
+      // 注册新的事件处理器
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        player.play()
+      })
+    } else if (mimeType.value.startsWith('video/')) {
+      // 如果 MIME 类型表明这是一个普通的视频文件，直接使用播放器加载
+      player.video.src = localPlayUrl.value
+      player.play()
+    } else {
+      console.warn('Unsupported media type:', mimeType.value)
+    }
   }
 }
 

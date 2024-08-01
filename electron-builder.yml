@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: com.65tiankehan.GlobalTV-Public
 productName: GlobalTV
 directories:
   buildResources: build
@@ -39,7 +39,8 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: github
+  owner: 65tiankehan
+  repo: GlobalTV-Public
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

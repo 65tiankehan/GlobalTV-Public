@@ -5,6 +5,7 @@ import { useStore } from 'vuex'
 import { ArrowUndoOutline as CashIcon } from '@vicons/ionicons5'
 import axios from 'axios'
 
+
 const loadingBar = useLoadingBar()
 const message = useMessage()
 const dialog = useDialog()
@@ -14,7 +15,7 @@ const store = useStore()
 // 使用computed属性来访问getter
 const notices = computed(() => store.getters.getNotices)
 // 使用computed属性来访问getter
-const showUpdate = computed(() => store.getters.getShowUpdate)
+
 
 // 使用computed属性来访问getter
 const PlayStarted = computed(() => store.getters.getPlayStarted)
@@ -66,6 +67,19 @@ const setversionDescriptions = (versionDescriptions: string[]) => {
   store.commit('SET_VERSIONDESCRIPTIONS', versionDescriptions)
 }
 
+// 使用store.commit来调用mutation
+const setlocalPlayUrl = (localPlayUrl: string) => {
+  store.commit('SET_LOCALPLAYURL', localPlayUrl)
+}
+
+// 使用store.commit来调用mutation
+const setmimeType = (mimeType: string) => {
+  store.commit('SET_MIMETYPE', mimeType)
+}
+
+const versionB = ref('')
+
+
 const threadFun = (value: string) => {
 
   notification.success({
@@ -89,18 +103,42 @@ const intelligenceFun = (value: string) => {
     keepAliveOnHover: true
   })
 }
+// 假设你有这样一个函数来创建 Blob URL
+const createBlobUrl = (file) => {
+  const blobUrl = URL.createObjectURL(file)
+  // 保存 MIME 类型
+  const mimeType = file.type
+  return { blobUrl, mimeType }
+}
 
+
+//打开本地视频
 const selectFiles = () => {
-  fileInput.value?.click()
+  if (fileInput.value) {
+    fileInput.value.click()
+  }
 }
 const onFileSelected = (event: Event) => {
-  const files = (event.target as HTMLInputElement).files
-  if (files) {
+  const files = (event.target as HTMLInputElement)?.files
+  if (files && files.length > 0) {
     console.log('Selected files:', files)
+    const file = files[0]
     // 在这里添加处理文件的逻辑
+    // 创建 Blob URL 和保存 MIME 类型
+    const { blobUrl, mimeType } = createBlobUrl(file)
+    setlocalPlayUrl(blobUrl) // 设置播放地址
+    setPlayStarted(true) // 打开播放窗口
+    setmimeType(mimeType) // 设置类型
+
+    // 清空文件输入框的状态，允许重新选择同一个文件
+    if (fileInput.value) {
+      fileInput.value.value = '' // 或者使用 dispatchEvent 方法
+    }
   }
 }
 
+
+//打开下载视频
 
 //删除vuex中的指定的消息
 const removeSpecifiedNotices = (index: number) => {
@@ -129,8 +167,9 @@ async function checkForUpdates() {
       console.log(`Application version: ${version}`)
       if (res.data.version !== `${version}`) {
         message.success('有新版本')
+
         setversionDescriptions(res.data.versionDescription)
-        setshowUpdate(!showUpdate.value)
+        setshowUpdate(true)
       } else {
         message.success('没有新版本')
       }
@@ -144,15 +183,32 @@ async function checkForUpdates() {
 
 }
 
+// 请求版本号
+window.electron.ipcRenderer.send('version-request-Y')
+// 监听版本号的响应
+window.electron.ipcRenderer.on('version-response-Y', (_event, version) => {
+  console.log(`Application version: ${version}`)
+  versionB.value = version
+})
 //打开up主关注页面
 const openUp = () => {
   window.electron.ipcRenderer.send('OpenExternal', 'https://space.bilibili.com/393402835/video')
 }
+
+//返回，并清空播放地址
+const closePlayStarted = () => {
+  setPlayStarted(false)
+  setlocalPlayUrl('')
+  setmimeType('')
+}
+
 </script>
 
 <template>
   <div id="titleLabel">
     <input ref="fileInput" type="file" accept=".mp4, video/mp4" multiple @change="onFileSelected"
+           style="display: none;" />
+    <input ref="fileInput2" type="file" accept=".mp4, video/mp4" multiple
            style="display: none;" />
     <div style="
         display: flex;
@@ -209,7 +265,8 @@ const openUp = () => {
         <div v-show="!PlayStarted" class="titleText">Global TV</div>
         <div v-show="PlayStarted">
           <n-button dashed circle ghost round style="  -webkit-app-region: no-drag;" size="small"
-                    @click="setPlayStarted(false)">
+                    @click="closePlayStarted">
+
             <template #icon>
               <n-icon>
                 <CashIcon />
@@ -282,7 +339,7 @@ const openUp = () => {
                      style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>打开下载视频</span>
-                    <n-button size="tiny" @click="selectFiles">查看</n-button>
+                    <n-button size="tiny" >查看</n-button>
                   </div>
                 </div>
               </div>
@@ -308,7 +365,7 @@ const openUp = () => {
                 <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
                      style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
-                    <span>当前版本：v0.0.1</span>
+                    <span>当前版本：v{{ versionB }}</span>
                     <n-button size="tiny" @click="checkForUpdates">检查版本</n-button>
                   </div>
                 </div>

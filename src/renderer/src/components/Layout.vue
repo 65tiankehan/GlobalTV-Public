@@ -13,7 +13,7 @@ import TVDramaCanvas from './TVDramaCanvas.vue'
 import OptionListSub from './OptionListSub.vue'
 import Taskbar from './Taskbar.vue'
 import Play from './Play.vue'
-
+import { useMessage } from 'naive-ui'
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 
@@ -50,6 +50,8 @@ interface tvDrama {
   Scenario?: string,
   streamingSources?: streamingSources[]
 }
+
+const message = useMessage()
 
 // 创建一个 tvDrama 类型的变量
 const dramaDetails = ref<tvDrama>({
@@ -150,18 +152,16 @@ const pagination = (page: number) => {
 
 //取消更新
 const cancelUpdate = () => {
-
+  message.error('取消更新')
   setshowUpdate(false)
 }
 
 //开始更新
 const startUpdate = () => {
+  message.info('开始更新')
+  window.electron.ipcRenderer.send('check-for-update')
   setshowUpdate(false)
-  notices.value.push({
-    title: '版本更新',
-    message: '版本更新完成！'
-  })
-  setNotices(notices.value)
+
 }
 
 //得到详情地址，去除地址中的${及其后面的字符串，返回剩于字符串
@@ -172,6 +172,47 @@ function extractBeforeDollarBrace(str: string): string {
   }
   return str // 如果没有找到 '${'，返回原始字符串
 }
+
+//睡眠
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+//封装睡眠
+async function SleepForUpdates(ms: number) {
+  await sleep(ms)
+}
+
+//接受来自主进程更新事件
+window.electron.ipcRenderer.on('update-downloaded', (_event, info) => {
+  console.log('Received update-downloaded event:', info.version)
+
+  // 在这里处理版本信息，例如显示在 UI 上
+  notices.value.push({
+    title: '版本更新',
+    message: info.version + '版本更新完成！'
+  })
+
+  setNotices(notices.value)//往消息队列Notices发送消息
+  message.loading('应用更新完成！稍后将自行重启！', { duration: 1500 })//全局提升
+  SleepForUpdates(8000)//停顿3秒
+  //通知主进程重启更新
+  window.electron.ipcRenderer.send('check-for-update-yes')
+
+  //
+})
+
+//接受来自主进程的更新失败事件
+window.electron.ipcRenderer.on('update-downloaded-err', (_event, info) => {
+  console.log('Received update-downloaded-err event:', info)
+  message.error('更新失败！' + info, { duration: 1500 })
+})
+
+//接受来自主进程的更新进度
+window.electron.ipcRenderer.on('download-progress-r', (_event, info) => {
+  message.loading('应用更新：' + info, { duration: 1500 })
+})
+
 
 //随机返回标签颜色
 function getRandomType(): 'default' | 'primary' | 'info' | 'success' | 'warning' | 'error' {

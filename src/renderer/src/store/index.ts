@@ -25,7 +25,9 @@ export default createStore({
       videoDetailsLoading: '',//视频详情加载url，这个一发生变化，就弹开详情窗口，进入详情加载
       PlayStarted: false,//播放开始
       StreamSource: '',//视频源
-      versionDescriptions:[]//版本更新内容
+      versionDescriptions: [],//版本更新内容
+      localPlayUrl: '',//本地播放 Blob URL
+      mimeType:''//本地视频类型
     }
   },
   getters: {
@@ -83,6 +85,13 @@ export default createStore({
     getVersionDescriptions: (state) => {
       return state.versionDescriptions
     }
+    ,
+    getLocalPlayUrl: (state) => {
+      return state.localPlayUrl
+    },
+    getMimeType: (state) => {
+      return state.mimeType
+    }
 
   },
   mutations: {
@@ -139,6 +148,12 @@ export default createStore({
     },
     SET_VERSIONDESCRIPTIONS: (state, payload) => {
       state.versionDescriptions = payload
+    },
+    SET_LOCALPLAYURL: (state, payload) => {
+      state.localPlayUrl = payload
+    },
+    SET_MIMETYPE: (state, payload) => {
+      state.mimeType = payload
     }
   }
 })

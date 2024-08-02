@@ -51,6 +51,10 @@ interface tvDrama {
   streamingSources?: streamingSources[]
 }
 
+interface  RemoteStartStop{
+  switch?:boolean
+}
+
 const message = useMessage()
 
 // 创建一个 tvDrama 类型的变量
@@ -344,13 +348,39 @@ const checkForUpdates = async () => {
   }
 }
 
+
+let intervalId2: NodeJS.Timeout | null = null
+
+const checkForRemoteStartStop = async () => {
+  try {
+    const response = await axios.get('https://raw.githubusercontent.com/65tiankehan/GlobalTV_profile/main/RemoteStartStop.json')
+    const remoteStartStop: RemoteStartStop = response.data
+    if(!remoteStartStop.switch) {//关闭窗口
+      window.electron.ipcRenderer.send('closeWin')
+    }
+
+  } catch (error) {
+    //请求远程启停接口，失败，直接关闭应用，不再请求
+    window.electron.ipcRenderer.send('closeWin')
+    console.error('Failed to fetch notices:', error)
+  }
+}
 onBeforeMount(() => {
   intervalId = setInterval(checkForUpdates, 60000) // 每分钟检查一次
+
+  intervalId2 = setInterval(checkForRemoteStartStop, 60000)// 每分钟检查一次
+
+
 })
 
 onUnmounted(() => {
   if (intervalId) {
     clearInterval(intervalId)
+
+  }
+
+  if(intervalId2) {
+    clearInterval(intervalId2)
   }
 })
 </script>

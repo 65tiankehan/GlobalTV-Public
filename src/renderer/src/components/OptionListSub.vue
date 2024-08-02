@@ -4,6 +4,12 @@
 import { sites, OptionSelects } from '../OptionSelectsSub' // 美剧
 import { AMERICANMOVIES } from '../AmericanMovies'// 美国电影
 import { DOMESTICDRAMA } from '../DomesticDrama'//国产剧
+import { TvAncientCostumes } from '../TvAncientCostume'//古装
+import  {Warfares} from '../Warfare'//战争
+import  {Comedys} from '../Comedy'//喜剧
+import  {Familys} from '../Family'//家庭
+import {Crimes} from '../Crime'//犯罪
+
 import { useStore } from 'vuex'
 import { computed, watch, ref, onBeforeMount, onUnmounted } from 'vue'
 
@@ -59,7 +65,15 @@ const total = computed(() => store.getters.getTotal)
 // 使用computed属性来访问getter
 const PaginationUrl = computed(() => store.getters.getPaginationUrl)
 
-const combinedLists: OptionSelects[][] = [sites, AMERICANMOVIES, DOMESTICDRAMA]
+const combinedLists: OptionSelects[][] = [sites,
+  AMERICANMOVIES,
+  DOMESTICDRAMA,
+  TvAncientCostumes,
+  Warfares,
+  Comedys,
+  Familys,
+  Crimes
+]
 
 
 // 使用Map来存储每个key对应的所有对象

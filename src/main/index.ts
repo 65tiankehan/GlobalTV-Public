@@ -34,7 +34,7 @@ function createTray(mainWindow: BrowserWindow): void {
       label: '版本更新',
       click: () => {
         // 实现版本更新的逻辑
-        shell.openExternal('https://space.bilibili.com/393402835?spm_id_from=333.1007.0.0')
+        autoUpdater.checkForUpdates()
       },
       icon: updateIcon
     }

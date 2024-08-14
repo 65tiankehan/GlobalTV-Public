@@ -4,7 +4,7 @@ import { BagAdd as Easel, Happy as Happy, LogoMarkdown as LogoMarkdown } from '@
 import Player from 'nplayer'
 import Hls from 'hls.js'
 import { useStore } from 'vuex'
-
+import { useMessage } from 'naive-ui'
 
 import axios from 'axios'
 import * as cheerio from 'cheerio'
@@ -22,8 +22,15 @@ interface StreamingSources {
   EpisodeCollection: EpisodeCollection[]
 }
 
-const store = useStore()
+interface smartRoutePath {
+  localPath?: string,
+  path?: string//线路，用于替代相关palyer**Url
 
+}
+
+const isToggLed = ref('0-0')
+const store = useStore()
+const message = useMessage()
 // 使用computed属性来访问getter
 const payVideoUrl = computed(() => store.getters.getPayVideoUrl)
 // 使用computed属性来访问getter
@@ -36,10 +43,23 @@ const localPlayUrl = computed(() => store.getters.getLocalPlayUrl)
 const mimeType = computed(() => store.getters.getMimeType)
 
 
+// 使用computed属性来访问getter
+const isSmartRouteEnabled = computed(() => store.getters.getIsSmartRouteEnabled)
+
+// 使用computed属性来访问getter
+const smartRoutePaths = computed(() => store.getters.getSmartRoutePaths)
+
 const props = defineProps({
   myPropTitle: String,
   streamingSource: { type: Array as () => StreamingSources[], default: () => [] }
 })
+
+const internalStreamingSource = ref(props.streamingSource)
+
+// 使用 ref 创建一个响应式的本地副本
+const localStreamingSource = ref([...props.streamingSource])
+//清空
+clearStreamingSource()
 // 使用store.commit来调用mutation
 const setStreamSource = (StreamSource: string) => {
   store.commit('SET_STREAMSOURCE', StreamSource)
@@ -47,6 +67,11 @@ const setStreamSource = (StreamSource: string) => {
 
 const loadSource = ref('')
 
+
+// 方法用于清空 localStreamingSource
+function clearStreamingSource() {
+  localStreamingSource.value = []
+}
 
 function extractBeforeDollarBrace(str: string): string {
   const index = str.indexOf('${')
@@ -88,30 +113,196 @@ onMounted(() => {
 
 //解析来源，并准备播放
 const prepareForPlayback = () => {
-  axios.get(payVideoUrl.value.slice(0, payVideoUrl.value.length - 1) + extractBeforeDollarBrace(StreamSource.value))
-    .then((resp) => {
-      const $ = cheerio.load(resp.data)
-      $('a').each(function(n, m) {
-        console.log('第' + (n + 1) + '条')
-        if ('bfurl' === $(m).attr('id')) {
-          loadSource.value = $(m).attr('href') ?? ''
+  //是否是智能路由
+  if (localStreamingSource.value.length <= 0) {
+    axios.get(payVideoUrl.value.slice(0, payVideoUrl.value.length - 1) + extractBeforeDollarBrace(StreamSource.value))
+      .then((resp) => {
+        const $ = cheerio.load(resp.data)
+        $('a').each(function(n, m) {
+          console.log('第' + (n + 1) + '条')
+          if ('bfurl' === $(m).attr('id')) {
+            loadSource.value = $(m).attr('href') ?? ''
+
+            console.log(loadSource.value)
+            // 检查 URL 扩展名
+            const extension = loadSource.value.split('.').pop()?.toLowerCase()
+
+            if (extension === 'm3u8') {
+              // 如果是 HLS 格式，则使用 HLS 播放器
+              hls.loadSource(loadSource.value)
+              hls.attachMedia(player.video)
+
+              // 监听 HLS 加载完成事件
+              hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                // 视频加载完成后，等待用户交互再播放
+                player.play()
+
+              })
+            } else if (extension === 'mp4') {
+              // 如果是 MP4 格式，则直接使用浏览器的 video 标签播放
+              player.video.src = loadSource.value
+              player.video.oncanplay = function() {
+                player.play()
+
+              }
+            } else {
+              console.warn('Unsupported file format:', loadSource.value)
+              setTimeout(() => {
+                searchForAlternativeSources()
+              }, 5000) // 等待 5 秒
+            }
+          } else {
+            return
+          }
+        })
+
+      })
+      .catch((err) => {
+        console.log(err)
+        setTimeout(() => {
+          searchForAlternativeSources()
+        }, 5000) // 等待 5 秒
+
+      })
+  } else {
+    console.log('url :' + smartRoutePaths.value[0].localPath + StreamSource.value)
+    axios.get(smartRoutePaths.value[0].localPath + StreamSource.value)
+      .then((resp) => {
+        const $ = cheerio.load(resp.data)
+        console.log('智能内容')
+        // console.log($('div.player-box-main').html())
+        const scriptContent = $($('div.player-box-main').children('script')).first().text()
+
+
+        // 使用正则表达式移除 var player_aaaa = 和分号
+
+        const jsonData = JSON.parse(scriptContent.replace(/var player_aaaa=|;/g, ''))
+        // 移除 var player_aaaa = 部分，并将其转换为 JSON 对象
+        console.log()
+        const urlParams = new URLSearchParams(new URL(jsonData.url).search)
+        const queryValue = urlParams.get('url')
+        loadSource.value = queryValue ?? ''
+        // 检查 URL 扩展名
+        const extension = loadSource.value.split('.').pop()?.toLowerCase()
+
+        if (extension === 'm3u8') {
+          // 如果是 HLS 格式，则使用 HLS 播放器
           hls.loadSource(loadSource.value)
           hls.attachMedia(player.video)
 
-          // 监听HLS加载完成事件
+          // 监听 HLS 加载完成事件
           hls.on(Hls.Events.MANIFEST_PARSED, function() {
             // 视频加载完成后，等待用户交互再播放
             player.play()
+
           })
-        } else {
-          return
+        } else if (extension === 'mp4') {
+          // 如果是 MP4 格式，则直接使用浏览器的 video 标签播放
+          player.video.src = loadSource.value
+          player.video.oncanplay = function() {
+            player.play()
+
+          }
         }
+
+
       })
+      .catch((err) => {
+        console.log(err)
+        setTimeout(() => {
+          searchForAlternativeSources()
+        }, 5000) // 等待 5 秒
+
+      })
+  }
+
+}
+
+function encodeSearchWord(searchWord: string): string {
+  return `${encodeURIComponent(searchWord)}`
+}
+
+// 搜索备用源
+const searchForAlternativeSources = () => {
+  console.log('尝试智能')
+  if (isSmartRouteEnabled.value) {
+    // 存储所有 href 值
+    const hrefValues: smartRoutePath[] = []
+    console.log('开启智能')
+    smartRoutePaths.value.forEach(path => {
+      const searchUrl = `${path.path}` + encodeSearchWord(props.myPropTitle ? props.myPropTitle : '')
+      console.log('线路：' + searchUrl)
+      axios.get(searchUrl)
+        .then(response => {
+          console.log('智能线路搜索：' + props.myPropTitle + '，结果如下')
+          // 加载 HTML 到 Cheerio
+          const $ = cheerio.load(response.data)
+
+
+          // 使用选择器来定位到包含 "详情" 文本的 a 标签
+          const $links2 = $('.module-card-item-footer .play-btn-o')
+
+          // 遍历所有匹配的 a 标签
+          $links2.each((index, element) => {
+            // 提取 href 属性值
+            const hrefValue = $(element).attr('href')
+            if (hrefValue) { // 确保 hrefValue 不为 undefined
+              hrefValues.push({
+                path: hrefValue,
+                localPath: path.localPath
+              })
+              console.log(`The href value for link ${index + 1} is:`, hrefValue)
+            } else {
+              console.warn(`No href attribute found for link ${index + 1}`)
+            }
+
+          })
+
+
+          //判断是否有链接
+          if (hrefValues.length > 0) {
+            clearStreamingSource()
+            hrefValues.forEach((route, index) => {
+              localStreamingSource.value.push({
+                EpisodeCollection: [],
+                name: '智能线路推荐' + index
+              })
+              if (route.path && route.localPath) {
+                axios.get(route.localPath + route.path).then((resp) => {
+                  const $ = cheerio.load(resp.data)
+
+
+                  $($('div.module-list').children('div.module-play-list')).each(function(n, m) {
+                    console.log('推荐：' + (n + 1) + '条')
+
+                    localStreamingSource.value[index].EpisodeCollection.push({
+                      title: $($(m).children('div.module-play-list-content')).children('a.module-play-list-link').text(),
+                      url: $($(m).children('div.module-play-list-content')).children('a.module-play-list-link').attr('href')
+                    })
+
+                  })
+
+                }).catch((err) => {
+                  console.log(err)
+                })
+
+
+              }
+
+            })
+            //清空props.streamingSource
+            internalStreamingSource.value.length = 0
+            message.success('智能线路推荐成功！', { duration: 1500 })
+          }
+        })
+        .catch(error => {
+          console.error(`Error fetching ${searchUrl}:`, error)
+        })
+
 
     })
-    .catch((err) => {
-      console.log(err)
-    })
+  }
+
 }
 
 //设置来源
@@ -124,6 +315,8 @@ const setMediaSource = (url: string | undefined) => {
   }
 
   try {
+    console.log('URL')
+    console.log(url)
     // 调用setStreamSource之前，可以添加任何必要的逻辑检查
     setStreamSource(url)
     // 准备播放之前，也可以添加任何必要的逻辑检查
@@ -160,6 +353,7 @@ const preparelocalPlayUrl = () => {
     }
   }
 }
+
 
 </script>
 
@@ -348,18 +542,33 @@ const preparelocalPlayUrl = () => {
         {{ props.myPropTitle }}
       </n-h3>
       <n-tabs type="bar" animated placement="right" style="height: 95%;">
-        <n-tab-pane v-for="(item, index) in props.streamingSource" :key="index" :name="item.name"
+
+        <n-tab-pane v-for="(item, index) in localStreamingSource" :key="index" :name="item.name"
                     :tab="item.name" style="height: 99%;">
           <div class="NeworldscroE">
             <n-space style="flex-grow: 1;" justify="end">
-              <n-button @click="setMediaSource(item2.url)" strong secondary
+              <n-button @click="setMediaSource(item2.url);isToggLed=index+'-'+index2" strong secondary
                         v-for="(item2, index2) in item.EpisodeCollection"
-                        :key="index2">
+                        :key="index2" :type="isToggLed == index+'-'+index2 ? 'primary' : 'default'">
                 {{ item2.title }}
               </n-button>
             </n-space>
           </div>
         </n-tab-pane>
+
+        <n-tab-pane v-for="(item, index) in props.streamingSource" :key="index" :name="item.name"
+                    :tab="item.name" style="height: 99%;">
+          <div class="NeworldscroE">
+            <n-space style="flex-grow: 1;" justify="end">
+              <n-button @click="setMediaSource(item2.url);isToggLed=index+'-'+index2" strong secondary
+                        v-for="(item2, index2) in item.EpisodeCollection"
+                        :key="index2" :type="isToggLed == index+'-'+index2 ? 'primary' : 'default'">
+                {{ item2.title }}
+              </n-button>
+            </n-space>
+          </div>
+        </n-tab-pane>
+
       </n-tabs>
     </div>
   </div>

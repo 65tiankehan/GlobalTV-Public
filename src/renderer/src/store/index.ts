@@ -5,6 +5,12 @@ interface Notice {
   message: string
 }
 
+interface smartRoutePath {
+  localPath?: string,
+  path?: string//线路，用于替代相关palyer**Url
+
+}
+
 export default createStore({
   state() {
     return {
@@ -14,7 +20,7 @@ export default createStore({
       playAddress2: -1,//这个是二级目录选择值
       theme: 'darkTheme',//lightTheme 亮，darkTheme 暗
       playRoute: 'https://jx.2s0.cn/player/?url=',
-      playVideoUrl: 'https://www.yyds.one/',
+      playVideoUrl: 'https://xhvod.com/',//http://www.cechi7.com/dianshiju/guochanju/；https://xhvod.com/tv/2.html；https://www.kanys4.com/filmshow/gcj-----------.html
       playVideoType: '',
       breadcrumbs: ['首页'],
       page: 1,
@@ -27,7 +33,12 @@ export default createStore({
       StreamSource: '',//视频源
       versionDescriptions: [],//版本更新内容
       localPlayUrl: '',//本地播放 Blob URL
-      mimeType:''//本地视频类型
+      mimeType: '',//本地视频类型
+      isSmartRouteEnabled: false,//是否开启智能路由
+      smartRoutePaths: [{
+        localPath: 'https://ml-tv.cc',
+        path: 'https://ml-tv.cc/index.php/vod/search.html?wd='
+      }] as smartRoutePath[]//智能路由
     }
   },
   getters: {
@@ -92,6 +103,14 @@ export default createStore({
     getMimeType: (state) => {
       return state.mimeType
     }
+    ,
+    getIsSmartRouteEnabled: (state) => {
+      return state.isSmartRouteEnabled
+    }
+    ,
+    getSmartRoutePaths: (state) => {
+      return state.smartRoutePaths
+    }
 
   },
   mutations: {
@@ -154,6 +173,13 @@ export default createStore({
     },
     SET_MIMETYPE: (state, payload) => {
       state.mimeType = payload
+    }
+    ,
+    SET_ISSMARTROUTEENABLED: (state, payload) => {
+      state.isSmartRouteEnabled = payload
+    },
+    SET_SMARTROUTEPATHS: (state, payload) => {
+      state.smartRoutePaths = payload
     }
   }
 })

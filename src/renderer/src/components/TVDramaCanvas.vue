@@ -34,7 +34,9 @@ interface tvDrama {
   moviesUrl?: string
   moviesImgUrl?: string
   download?: boolean,
-  Progress: number
+  Progress: number,
+  prompt?: string,
+  prompt2?: string
 }
 
 const store = useStore()
@@ -68,19 +70,12 @@ const setVideoDetailsLoading = (url: string) => {
 const NeworldscroE = ref<HTMLElement | null>(null)
 const journalismList = ref<tvDrama[]>([])
 const message = useMessage()
-const classAnswerX = ref(0)
-const dataIndexX = ref(0)
+
 const totalSUrlElX = ref<string>('')
-const totalSUrlX = ref('')
+
 const typeUrlIpX = ref('')
 const LatestMovies = ref([])
 const tuplesX = ref([])
-const typeMap = {
-  电影: { classAnswer: 0, totalSUrl: '1' },
-  电视剧: { classAnswer: 1, totalSUrl: '2' },
-  动漫: { classAnswer: 3, totalSUrl: '4' },
-  综艺: { classAnswer: 2, totalSUrl: '3' }
-}
 
 
 // 监听 playVideoType 的变化,刷新journalismList
@@ -101,33 +96,31 @@ watch(playVideoType, (newVal, oldVal) => {
         const arrx: tvDrama[] = []
 
         const $ = cheerio.load(resp.data)
-        $($('div.module-items').children('div.module-item')).each(function(n, m) {
-          console.log('第' + (n + 1) + '条')
-          const pro = {
-            moviesUrl: $($($(m).children('div.module-item-cover')).children('div.module-item-pic'))
-              .children('img')
-              .attr('data-src'),
-            moviesImgUrl: $($($(m).children('div.module-item-cover')).children('div.module-item-pic'))
-              .children('a')
-              .attr('href'),
-            name: $($($(m).children('div.module-item-cover')).children('div.module-item-pic'))
-              .children('a')
-              .attr('title'),
-            Preview: Math.floor(Math.random() * 100) + 1,
-            like: Math.floor(Math.random() * 100) + 1,
-            comment: Math.floor(Math.random() * 100) + 1,
-            download: false,
-            Progress: 0
-          }
 
-          $($($(m).children('div.module-item-cover')).children('div.module-item-content'))
-            .children('div.module-item-style')
-            .each(function(b, j) {
-              if (b == 2) {
-                pro['NexT'] = $(j).text()
+        $('ul.ewave-vodlist.clearfix').each(function(_n, m) {
+          $(m).children('li').each(function(_b, j) {
+            const pro = {
+              moviesUrl: $($(j).children('div.ewave-vodlist__box')).children('a').attr('data-original'),
+              moviesImgUrl: $($(j).children('div.ewave-vodlist__box')).children('a').attr('href'),
+              name: $($(j).children('div.ewave-vodlist__box')).children('a').attr('title'),
+              Preview: Math.floor(Math.random() * 100) + 1,
+              like: Math.floor(Math.random() * 100) + 1,
+              comment: Math.floor(Math.random() * 100) + 1,
+              download: false,
+              Progress: 0
+            }
+
+            $($($(j).children('div.ewave-vodlist__box')).children('a')).children('span').each(function(c, d) {
+
+              if ($(d).text() != '' && c == 2) {
+                pro['prompt'] = $(d).text()
+              }
+              if ($(d).text() != '' && c == 1) {
+                pro['prompt2'] = $(d).text()
               }
             })
-          arrx.push(pro)
+            arrx.push(pro)
+          })
         })
 
         // eslint-disable-next-line vue/no-ref-as-operand
@@ -142,11 +135,7 @@ watch(playVideoType, (newVal, oldVal) => {
 
 
 const fetchMovies = () => {
-  const { classAnswer, totalSUrl } = typeMap['电影']
-  const netWorkUrl = payVideoUrl.value + `show/${totalSUrl}--------${dataIndexX.value}---.html`
-  console.log(netWorkUrl)
-  classAnswerX.value = classAnswer
-  totalSUrlX.value = netWorkUrl
+
   totalSUrlElX.value = payVideoUrl.value
   typeUrlIpX.value = ''
   message.loading('正在加载影视数据（已显示数据为准）', { duration: 1500 })
@@ -161,36 +150,31 @@ const fetchMovies = () => {
 
       const arrx: tvDrama[] = []
       //最新影片 start 默认首页解析
-      $($('div.module-items').children('div.module-item')).each(function(n, m) {
 
-        console.log('第' + (n + 1) + '条')
-        const pro = {
-          moviesUrl: $($($(m).children('div.module-item-cover')).children('div.module-item-pic'))
-            .children('img')
-            .attr('data-src'),
-          moviesImgUrl: $($($(m).children('div.module-item-cover')).children('div.module-item-pic'))
-            .children('a')
-            .attr('href'),
-          name: $($($(m).children('div.module-item-cover')).children('div.module-item-pic'))
-            .children('a')
-            .attr('title'),
-          Preview: Math.floor(Math.random() * 100) + 1,
-          like: Math.floor(Math.random() * 100) + 1,
-          comment: Math.floor(Math.random() * 100) + 1,
-          download: false,
-          Progress: 0
-        }
+      $('ul.ewave-vodlist.clearfix').each(function(_n, m) {
+        $(m).children('li').each(function(_b, j) {
+          const pro = {
+            moviesUrl: $($(j).children('div.ewave-vodlist__box')).children('a').attr('data-original'),
+            moviesImgUrl: $($(j).children('div.ewave-vodlist__box')).children('a').attr('href'),
+            name: $($(j).children('div.ewave-vodlist__box')).children('a').attr('title'),
+            Preview: Math.floor(Math.random() * 100) + 1,
+            like: Math.floor(Math.random() * 100) + 1,
+            comment: Math.floor(Math.random() * 100) + 1,
+            download: false,
+            Progress: 0
+          }
 
-        $($($(m).children('div.module-item-cover')).children('div.module-item-content'))
-          .children('div.module-item-style')
-          .each(function(b, j) {
-            if (b == 2) {
-              pro['NexT'] = $(j).text()
+          $($($(j).children('div.ewave-vodlist__box')).children('a')).children('span').each(function(c, d) {
+            if ($(d).text() != '' && c == 2) {
+              pro['prompt'] = $(d).text()
+            }
+            if ($(d).text() != '' && c == 1) {
+              pro['prompt2'] = $(d).text()
             }
           })
-        arrx.push(pro)
+          arrx.push(pro)
+        })
       })
-
       // eslint-disable-next-line vue/no-ref-as-operand
       journalismList.value = arrx
       message.success('刷新成功！', { duration: 1500 })
@@ -266,7 +250,7 @@ const showDetails = (url: string | undefined) => {
     const timestamp = Date.now()
     setVideoDetailsLoading(url + '${' + `${timestamp}`)
   } else {
-
+    console.log('')
   }
 
 }
@@ -307,9 +291,22 @@ const showDetails = (url: string | undefined) => {
         v-for="(item, index) in journalismList"
         :key="index"
       >
+
         <div class="homeTitleCarImg" style="position: relative">
           <!-- <img class="homeTitleCarImgI" :src="item.img" /> -->
           <img class="homeTitleCarImgI" :src="item.moviesUrl" />
+          <div style="position: absolute; z-index: 3; top: 5px; left: 8px">
+            <div style="background-color: #2080f0;color: #FFFFFF;border-radius:4px 0 8px 0;padding:2px 8px;">
+              {{ item.prompt }}
+            </div>
+
+          </div>
+          <div style="position: absolute; z-index: 3; bottom: 5px; right: 8px">
+            <div style="background-color: #2080f0;color: #FFFFFF;border-radius:4px 0 8px 0;padding:2px 8px;font-size: 11px;">
+              {{ item.prompt2 }}
+            </div>
+
+          </div>
           <div style="position: absolute; z-index: 3; top: 5px; right: 8px">
             <n-button text style="font-size: 24px" @click="triggerFileDownload(index)">
               <n-icon>
@@ -337,7 +334,12 @@ const showDetails = (url: string | undefined) => {
         <div class="homeTitleCarText">
           <div class="homeTitleCarTextNex">
             <div class="homeTitleCarTextNexTup">
-              <span> {{ item.name }} </span>
+              <div style="  display: -webkit-box;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        text-overflow: ellipsis;">{{ item.name }}
+              </div>
             </div>
             <div class="homeTitleCarTextNexKup">
               <span>
@@ -515,13 +517,14 @@ const showDetails = (url: string | undefined) => {
   font-size: 12px;
   color: rgb(221, 214, 214);
   letter-spacing: 0;
-  line-height: 22px;
+  line-height: 13px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
   padding-left: 5px;
   padding-right: 5px;
   padding-bottom: 5px;
+
 }
 
 .homeTitleCarTextNexTup {

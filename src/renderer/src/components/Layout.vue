@@ -51,8 +51,8 @@ interface tvDrama {
   streamingSources?: streamingSources[]
 }
 
-interface  RemoteStartStop{
-  switch?:boolean
+interface RemoteStartStop {
+  switch?: boolean
 }
 
 const message = useMessage()
@@ -234,61 +234,44 @@ watch(videoDetailsLoading, (newVal, oldVal) => {
     .then((resp) => {
       const $ = cheerio.load(resp.data)
 
-
-      const tagLength = $($('div.video-info').children('div.video-info-main')).children('div.video-info-items').length
-      //得到详情和tag
-      $($('div.video-info').children('div.video-info-main')).children('div.video-info-items').each(function(n, m) {
-        console.log('第' + (n + 1) + '条')
-
-
-        //不找最后一条，因为最后一条是剧情
-        if (n < tagLength - 1) {
-          if (dramaDetails.value.tags)
-            dramaDetails.value.tags.push({
-              name: $(m).children('span.video-info-itemtitle').text() +
-                ($(m).children('div.video-info-item').text().length > 20
-                  ? $(m).children('div.video-info-item').text().slice(0, 20) + '...'
-                  : $(m).children('div.video-info-item').text()), color: getRandomType()
-            })
-        } else {
-          dramaDetails.value.Scenario = $(m).children('div.video-info-item').text()
-        }
-
+      //tag
+      $('div.ewave-content__detail').children('p.data').each(function(_n, m) {
+        if (dramaDetails.value.tags)
+          dramaDetails.value.tags.push({
+            name:
+              ($(m).text().length > 20
+                ? $(m).text().slice(0, 20) + '...'
+                : $(m).text()), color: getRandomType()
+          })
       })
 
-      dramaDetails.value.title = $($($('div.video-cover').children('div.module-item-cover')).children('div.module-item-pic')).children('img').attr('alt')
+      //详情
+      dramaDetails.value.Scenario = $('div.ewave-content__detail').children('p.desc.hidden-xs').text()
 
-      dramaDetails.value.imgUrl = $($($('div.video-cover').children('div.module-item-cover')).children('div.module-item-pic')).children('img').attr('data-src')
+      dramaDetails.value.title = $('div.ewave-content__thumb').children('a').attr('title')
+
+      dramaDetails.value.imgUrl = $($('div.ewave-content__thumb').children('a')).children('img').attr('data-original')
 
       //得到线路
-      $($($($($('div.module').children('div.module-heading')).children('div.module-tab')).children('div.module-tab-items')).children('div.module-tab-content')).children('div.module-tab-item').each(function(n, m) {
-        console.log('线路第' + (n + 1) + '条')
-
+      $('ul.nav.nav-tabs.pull-right.swiper-wrapper').children("li").each(function(_n, m) {
         if (dramaDetails.value.streamingSources) {
           dramaDetails.value.streamingSources.push({
-            name: $(m).children('span').text(),
+            name: $(m).text(),
             EpisodeCollection: []
           })
         }
-
       })
-      //得到选集
-      $($('div.module').children('div.module-list')).each(function(n, m) {
-        console.log('线路选集盒第' + (n + 1) + '条')
-        $($($(m).children('div.module-blocklist')).children('div.scroll-content')).children('a').each(function(i, b) {
-          console.log('集第' + (i + 1) + '条')
-          if (dramaDetails.value.streamingSources) {
 
-            dramaDetails.value.streamingSources[n].EpisodeCollection.push({
-              title: $($(b).children('span')).text(),
-              url: $(b).attr('href')
+      //得到选集
+      $($('ul.ewave-content__playlist.clearfix.column8.overflow').children('li')).each(function(_n, m) {
+          if (dramaDetails.value.streamingSources) {
+            dramaDetails.value.streamingSources[0].EpisodeCollection.push({
+              title: $($(m).children('a')).text(),
+              url: $($(m).children('a')).attr('href')
             })
           }
-
-
-        })
-
       })
+
 
       console.log(dramaDetails.value.streamingSources)
       //当上方数据加载完成后，展开窗口
@@ -355,7 +338,7 @@ const checkForRemoteStartStop = async () => {
   try {
     const response = await axios.get('https://raw.githubusercontent.com/65tiankehan/GlobalTV_profile/main/RemoteStartStop.json')
     const remoteStartStop: RemoteStartStop = response.data
-    if(!remoteStartStop.switch) {//关闭窗口
+    if (!remoteStartStop.switch) {//关闭窗口
       window.electron.ipcRenderer.send('closeWin')
     }
 
@@ -379,7 +362,7 @@ onUnmounted(() => {
 
   }
 
-  if(intervalId2) {
+  if (intervalId2) {
     clearInterval(intervalId2)
   }
 })

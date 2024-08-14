@@ -1,15 +1,32 @@
 <script setup lang="ts">
 
 
-import { sites, OptionSelects } from '../OptionSelectsSub' // 美剧
-import { AMERICANMOVIES } from '../AmericanMovies'// 美国电影
-import { DOMESTICDRAMA } from '../DomesticDrama'//国产剧
-import { TvAncientCostumes } from '../TvAncientCostume'//古装
-import  {Warfares} from '../Warfare'//战争
-import  {Comedys} from '../Comedy'//喜剧
-import  {Familys} from '../Family'//家庭
-import {Crimes} from '../Crime'//犯罪
+import { sites, OptionSelects } from '../OptionSelectsSub' // 国产剧（x
+import { AMERICANMOVIES } from '../AmericanMovies'// 香港剧
+import { DOMESTICDRAMA } from '../DomesticDrama'//台湾剧
+import { TvAncientCostumes } from '../TvAncientCostume'//日本剧
+import { Warfares } from '../Warfare'//韩国剧
+import { Comedys } from '../Comedy'//欧美剧
+import { Familys } from '../Family'//泰国剧
+import { Crimes } from '../Crime'//大陆综艺
+import { HKtv } from '../HkTv' //港台综艺
+import { kRjpTv } from '../KrJpTv'//日韩综艺
+import { EnUsTv } from '../EuUsTv'//欧美综艺
+import { CnAnimeTv } from '../CnAnimeTv'//国产动漫
+import { HkTwTv } from '../HkTwTv'//港台动漫
+import { JpKrAnimeTv } from '../JpKrAnimeTv'//日韩动漫
+import { EuUsAnimeTv } from '../EuUsAnimeTv'//欧美动漫
+import { OverseaAnime } from '../OverseasAnime'//海外动漫
 
+//动作片
+//喜剧片
+//爱情片
+//科幻片
+//恐怖片
+//剧情片
+//战争片
+//纪录片
+//4K电影
 import { useStore } from 'vuex'
 import { computed, watch, ref, onBeforeMount, onUnmounted } from 'vue'
 
@@ -22,6 +39,7 @@ interface fetchMiscArticles {
   fullDescription?: string,
   url?: string
 }
+const OptionListSubSelected = ref(-1)
 
 const store = useStore()
 
@@ -72,7 +90,15 @@ const combinedLists: OptionSelects[][] = [sites,
   Warfares,
   Comedys,
   Familys,
-  Crimes
+  Crimes,
+  HKtv,
+  kRjpTv,
+  EnUsTv,
+  CnAnimeTv,
+  HkTwTv,
+  JpKrAnimeTv,
+  EuUsAnimeTv,
+  OverseaAnime
 ]
 
 
@@ -83,17 +109,18 @@ let sitesPro: OptionSelects[] = groupedByKey.get(String(playAddress2.value)) || 
 
 const scrapeArticles = () => {
   axios
-    .get('https://www.bilibili.com/read/home?spm_id_from=333.1007.0.0')
+    .get('https://top.baidu.com/board?tab=realtime')
     .then((resp) => {
       fetchMiscArticlesB.value = []
       const $ = cheerio.load(resp.data)
-      $('div.feed').children('div.feed-item').each(function(n, m) {
-        console.log('第' + (n + 1) + '条')
+      $('div.category-wrap_iQLoo.horizontal_1eKyQ').each(function(_n, m) {
+
+        const urlLength: string = $($($(m).children('div.content_1YWBm')).children('div.hot-desc_1m_jR.large_nSuFU')).children('a').attr('href') ?? ''
         fetchMiscArticlesB.value.push(
           {
-            title: $(m).children('a').attr('title'),
-            briefDescription: $($($($(m).children('a')).children('div.article-item__left')).children('div.article-item__details')).children('div.article-item__desc').text(),
-            url: $(m).children('a').attr('href')
+            title: $($(m).children('div.content_1YWBm')).children('a').text(),
+            briefDescription: $($($(m).children('div.content_1YWBm')).children('div.hot-desc_1m_jR.large_nSuFU')).text(),
+            url: urlLength.substring(6, urlLength.length)
           }
         )
 
@@ -108,7 +135,7 @@ scrapeArticles()
 
 watch(playAddress2, (newVal, oldVal) => {
   console.log('playAddress2 changed from', oldVal, 'to', newVal)
-
+  OptionListSubSelected.value = -1
   combinedLists.forEach((array, index) => {
 
     // 只检查数组的第一个元素的key
@@ -141,12 +168,13 @@ watch(playAddress2, (newVal, oldVal) => {
 
 
 //改变选项卡目录
-const mountedOptionLists = (value: string, setbreadcrumb: string[], page: number, total: number, PaginationUrl: string) => {
+const mountedOptionLists = (value: string, setbreadcrumb: string[], page: number, total: number, PaginationUrl: string,index: number) => {
   setplayVideoType(value)
   setbreadcrumbs(setbreadcrumb)
   setpage(page)
   settotal(total)
   setPaginationUrl(PaginationUrl)
+  OptionListSubSelected.value = index
 }
 
 //打开文章
@@ -198,8 +226,8 @@ onUnmounted(() => {
     <div class="div2_Layout">
       <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__backInRight">
         <div
-          @click="mountedOptionLists(playVideoType,breadcrumbs,page,total,PaginationUrl)"
-          :class=" -1 == playAddress2
+          @click="mountedOptionLists(playVideoType,breadcrumbs,page,total,PaginationUrl,-1)"
+          :class=" -1 == OptionListSubSelected
             ? 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
             : 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height '
             "
@@ -223,7 +251,7 @@ onUnmounted(() => {
                   fill="#FF9000" p-id="43569"></path>
               </svg>
             </n-button>
-            <p style="color: #c4c4c4">子级选项</p>
+            <p style="color: #c4c4c4">{{ sitesPro.length <= 0 ? '热点新闻事件' : '二级选项' }}</p>
           </div>
         </div>
       </div>
@@ -236,9 +264,9 @@ onUnmounted(() => {
           class="accountPmc_Card accountPmc_Card_row animate__animated animate__backInRight"
         >
           <div
-            @click="mountedOptionLists(item.url,item.breadcrumb,item.Pagination.page,item.Pagination.total,item.PaginationUrl)"
+            @click="mountedOptionLists(item.url,item.breadcrumb,item.Pagination.page,item.Pagination.total,item.PaginationUrl,index)"
             :class="
-              index == playAddress2
+              index == OptionListSubSelected
                 ? 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
                 : 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height '
             "

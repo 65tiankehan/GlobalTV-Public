@@ -79,6 +79,9 @@ function resetDramaDetails() {
 
 const showModel = ref(false)
 const store = useStore()
+
+const paginationState = ref(false)
+
 // 使用computed属性来访问getter
 const breadcrumbs = computed(() => store.getters.getBreadcrumbs)
 
@@ -115,6 +118,8 @@ const PlayStarted = computed(() => store.getters.getPlayStarted)
 // 使用computed属性来访问getter
 const versionDescriptions = computed(() => store.getters.getVersionDescriptions)
 
+// 直接从 store 访问状态，这个是分类起始地址，当改变时，会触发计算属性的 getter
+const playRoute = computed(() => store.state.playRoute)
 
 // 使用store.commit来调用mutation
 const setplayVideoType = (url: string) => {
@@ -253,7 +258,7 @@ watch(videoDetailsLoading, (newVal, oldVal) => {
       dramaDetails.value.imgUrl = $($('div.ewave-content__thumb').children('a')).children('img').attr('data-original')
 
       //得到线路
-      $('ul.nav.nav-tabs.pull-right.swiper-wrapper').children("li").each(function(_n, m) {
+      $('ul.nav.nav-tabs.pull-right.swiper-wrapper').children('li').each(function(_n, m) {
         if (dramaDetails.value.streamingSources) {
           dramaDetails.value.streamingSources.push({
             name: $(m).text(),
@@ -264,12 +269,12 @@ watch(videoDetailsLoading, (newVal, oldVal) => {
 
       //得到选集
       $($('ul.ewave-content__playlist.clearfix.column8.overflow').children('li')).each(function(_n, m) {
-          if (dramaDetails.value.streamingSources) {
-            dramaDetails.value.streamingSources[0].EpisodeCollection.push({
-              title: $($(m).children('a')).text(),
-              url: $($(m).children('a')).attr('href')
-            })
-          }
+        if (dramaDetails.value.streamingSources) {
+          dramaDetails.value.streamingSources[0].EpisodeCollection.push({
+            title: $($(m).children('a')).text(),
+            url: $($(m).children('a')).attr('href')
+          })
+        }
       })
 
 
@@ -348,6 +353,23 @@ const checkForRemoteStartStop = async () => {
     console.error('Failed to fetch notices:', error)
   }
 }
+
+// 监听 playRoute 的变化,禁用分页
+watch(playRoute, (newVal, oldVal) => {
+  console.log('playVideoType changed from', oldVal, 'to', newVal)
+  paginationState.value = true
+
+
+})
+//监听 breadcrumbs的变化，启用分页
+watch(breadcrumbs, (newVal, oldVal) => {
+  console.log('playVideoType changed from', oldVal, 'to', newVal)
+  paginationState.value = false
+
+
+})
+
+
 onBeforeMount(() => {
   intervalId = setInterval(checkForUpdates, 60000) // 每分钟检查一次
 
@@ -396,10 +418,11 @@ onUnmounted(() => {
 
           </n-breadcrumb>
           <!--  表达排除首页 -->
+
           <n-pagination :page-slot="7" @update:page="pagination"
                         v-if="(playVideoType != '' && playVideoType != payVideoUrl)"
                         v-model:page="page"
-                        :page-count="total" show-quick-jumper>
+                        :page-count="total" show-quick-jumper :disabled="paginationState">
 
             <template #goto>
               跳转至

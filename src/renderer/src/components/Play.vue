@@ -118,43 +118,36 @@ const prepareForPlayback = () => {
     axios.get(payVideoUrl.value.slice(0, payVideoUrl.value.length - 1) + extractBeforeDollarBrace(StreamSource.value))
       .then((resp) => {
         const $ = cheerio.load(resp.data)
-        $('a').each(function(n, m) {
-          console.log('第' + (n + 1) + '条')
-          if ('bfurl' === $(m).attr('id')) {
-            loadSource.value = $(m).attr('href') ?? ''
 
-            console.log(loadSource.value)
-            // 检查 URL 扩展名
-            const extension = loadSource.value.split('.').pop()?.toLowerCase()
+        const scriptContent = $($('div.ewave-player__video.embed-responsive.embed-responsive-16by9.clearfix').children('script')).first().text()
+        const jsonData = JSON.parse(scriptContent.replace(/var player_aaaa=|;/g, ''))
 
-            if (extension === 'm3u8') {
-              // 如果是 HLS 格式，则使用 HLS 播放器
-              hls.loadSource(loadSource.value)
-              hls.attachMedia(player.video)
+        const queryValue = jsonData.url
+        loadSource.value = queryValue ?? ''
 
-              // 监听 HLS 加载完成事件
-              hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                // 视频加载完成后，等待用户交互再播放
-                player.play()
+        // 检查 URL 扩展名
+        const extension = loadSource.value.split('.').pop()?.toLowerCase()
 
-              })
-            } else if (extension === 'mp4') {
-              // 如果是 MP4 格式，则直接使用浏览器的 video 标签播放
-              player.video.src = loadSource.value
-              player.video.oncanplay = function() {
-                player.play()
+        if (extension === 'm3u8') {
+          // 如果是 HLS 格式，则使用 HLS 播放器
+          hls.loadSource(loadSource.value)
+          hls.attachMedia(player.video)
 
-              }
-            } else {
-              console.warn('Unsupported file format:', loadSource.value)
-              setTimeout(() => {
-                searchForAlternativeSources()
-              }, 5000) // 等待 5 秒
-            }
-          } else {
-            return
+          // 监听 HLS 加载完成事件
+          hls.on(Hls.Events.MANIFEST_PARSED, function() {
+            // 视频加载完成后，等待用户交互再播放
+            player.play()
+
+          })
+        } else if (extension === 'mp4') {
+          // 如果是 MP4 格式，则直接使用浏览器的 video 标签播放
+          player.video.src = loadSource.value
+          player.video.oncanplay = function() {
+            player.play()
+
           }
-        })
+        }
+
 
       })
       .catch((err) => {

@@ -19,7 +19,7 @@ export default createStore({
       playAddress1: -1,//这个是一级目录选择值
       playAddress2: -1,//这个是二级目录选择值
       theme: 'darkTheme',//lightTheme 亮，darkTheme 暗
-      playRoute: 'https://jx.2s0.cn/player/?url=',
+      playRoute: '',
       playVideoUrl: 'https://xhvod.com/',//http://www.cechi7.com/dianshiju/guochanju/；https://xhvod.com/tv/2.html；https://www.kanys4.com/filmshow/gcj-----------.html
       playVideoType: '',
       breadcrumbs: ['首页'],

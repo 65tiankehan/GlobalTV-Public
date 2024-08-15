@@ -50,6 +50,9 @@ const playVideoType = computed(() => store.state.playVideoType)
 // 使用computed属性来访问getter
 const notices = computed(() => store.getters.getNotices)
 
+// 直接从 store 访问状态，这个是分类起始地址，当改变时，会触发计算属性的 getter
+const playRoute = computed(() => store.state.playRoute)
+
 // 使用store.commit来调用mutation
 // const setPayVideoUrl = (url: string) => {
 //   store.commit('SET_PAYVIDEOURL', url)
@@ -77,6 +80,14 @@ const typeUrlIpX = ref('')
 const LatestMovies = ref([])
 const tuplesX = ref([])
 
+//得到详情地址，去除地址中的${及其后面的字符串，返回剩于字符串
+function extractBeforeDollarBrace(str: string): string {
+  const index = str.indexOf('${')
+  if (index !== -1) {
+    return str.slice(0, index)
+  }
+  return str // 如果没有找到 '${'，返回原始字符串
+}
 
 // 监听 playVideoType 的变化,刷新journalismList
 watch(playVideoType, (newVal, oldVal) => {
@@ -90,6 +101,61 @@ watch(playVideoType, (newVal, oldVal) => {
     console.log(payVideoUrl.value + playVideoType.value)
     axios
       .get(payVideoUrl.value + playVideoType.value)
+      .then((resp) => {
+        message.loading('正在加载影视数据（已显示数据为准）', { duration: 1500 })
+        journalismList.value = []
+        const arrx: tvDrama[] = []
+
+        const $ = cheerio.load(resp.data)
+
+        $('ul.ewave-vodlist.clearfix').each(function(_n, m) {
+          $(m).children('li').each(function(_b, j) {
+            const pro = {
+              moviesUrl: $($(j).children('div.ewave-vodlist__box')).children('a').attr('data-original'),
+              moviesImgUrl: $($(j).children('div.ewave-vodlist__box')).children('a').attr('href'),
+              name: $($(j).children('div.ewave-vodlist__box')).children('a').attr('title'),
+              Preview: Math.floor(Math.random() * 100) + 1,
+              like: Math.floor(Math.random() * 100) + 1,
+              comment: Math.floor(Math.random() * 100) + 1,
+              download: false,
+              Progress: 0
+            }
+
+            $($($(j).children('div.ewave-vodlist__box')).children('a')).children('span').each(function(c, d) {
+
+              if ($(d).text() != '' && c == 2) {
+                pro['prompt'] = $(d).text()
+              }
+              if ($(d).text() != '' && c == 1) {
+                pro['prompt2'] = $(d).text()
+              }
+            })
+            arrx.push(pro)
+          })
+        })
+
+        // eslint-disable-next-line vue/no-ref-as-operand
+        journalismList.value = arrx
+        message.success('刷新成功！', { duration: 1500 })
+      }).catch((err) => {
+      console.log(err)
+    })
+  }
+
+})
+
+// 监听 playRoute 的变化,刷新journalismList（搜索）
+watch(playRoute, (newVal, oldVal) => {
+  console.log('playVideoType changed from', oldVal, 'to', newVal)
+  if (NeworldscroE.value) {//将页面滚动到顶部
+    NeworldscroE.value.scrollTop = 0
+  }
+  if (newVal === payVideoUrl.value) {//如果一级目录点击首页，那就调用首页代码
+    fetchMovies()
+  } else {
+
+    axios
+      .get(payVideoUrl.value + 'so/-------------.html?wd=' + extractBeforeDollarBrace(newVal))
       .then((resp) => {
         message.loading('正在加载影视数据（已显示数据为准）', { duration: 1500 })
         journalismList.value = []
@@ -302,7 +368,8 @@ const showDetails = (url: string | undefined) => {
 
           </div>
           <div style="position: absolute; z-index: 3; bottom: 5px; right: 8px">
-            <div style="background-color: #2080f0;color: #FFFFFF;border-radius:4px 0 8px 0;padding:2px 8px;font-size: 11px;">
+            <div
+              style="background-color: #2080f0;color: #FFFFFF;border-radius:4px 0 8px 0;padding:2px 8px;font-size: 11px;">
               {{ item.prompt2 }}
             </div>
 

@@ -332,7 +332,7 @@ export const sites: OptionSelects[] = [{
     breadcrumb: ['首页', '剧情片']
     , Pagination: {
       page: 1,
-      total: 605
+      total: 607
     }
   },
   {
@@ -360,7 +360,7 @@ export const sites: OptionSelects[] = [{
     breadcrumb: ['首页', '纪录片']
     , Pagination: {
       page: 1,
-      total: 44
+      total: 45
     }
   },
   {

@@ -18,15 +18,15 @@ import { JpKrAnimeTv } from '../JpKrAnimeTv'//日韩动漫
 import { EuUsAnimeTv } from '../EuUsAnimeTv'//欧美动漫
 import { OverseaAnime } from '../OverseasAnime'//海外动漫
 
-//动作片
-//喜剧片
-//爱情片
-//科幻片
-//恐怖片
-//剧情片
-//战争片
-//纪录片
-//4K电影
+import { ActionMovieTv } from '../ActionMovieTv'//动作片
+import { ComedyMovieTv } from '../ComedyMovieTv'//喜剧片
+import { LoveMovieTv } from '../LoveMovieTv'//爱情片
+import { SciFiMovieTv } from '../SciFiMovieTv'//科幻片
+import { HorrorMovieTv } from '../HorrorMovieTv'//恐怖片
+import { DramaMovieTv } from '../DramaMovieTv'//剧情片
+import { WarMovieTv } from '../WarMovieTv'//战争片
+import { DocumentaryTv } from '../DocumentaryTv'//纪录片
+import { UHD4KMovieTv } from '../UHD4KMovieTv'//4K电影
 import { useStore } from 'vuex'
 import { computed, watch, ref, onBeforeMount, onUnmounted } from 'vue'
 
@@ -39,6 +39,7 @@ interface fetchMiscArticles {
   fullDescription?: string,
   url?: string
 }
+
 const OptionListSubSelected = ref(-1)
 
 const store = useStore()
@@ -98,7 +99,16 @@ const combinedLists: OptionSelects[][] = [sites,
   HkTwTv,
   JpKrAnimeTv,
   EuUsAnimeTv,
-  OverseaAnime
+  OverseaAnime,
+  ActionMovieTv,
+  ComedyMovieTv,
+  LoveMovieTv,
+  SciFiMovieTv,
+  HorrorMovieTv,
+  DramaMovieTv,
+  WarMovieTv,
+  DocumentaryTv,
+  UHD4KMovieTv
 ]
 
 
@@ -168,7 +178,7 @@ watch(playAddress2, (newVal, oldVal) => {
 
 
 //改变选项卡目录
-const mountedOptionLists = (value: string, setbreadcrumb: string[], page: number, total: number, PaginationUrl: string,index: number) => {
+const mountedOptionLists = (value: string, setbreadcrumb: string[], page: number, total: number, PaginationUrl: string, index: number) => {
   setplayVideoType(value)
   setbreadcrumbs(setbreadcrumb)
   setpage(page)

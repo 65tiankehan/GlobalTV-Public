@@ -15,7 +15,6 @@
     "dev": "electron-vite dev -w",
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
-
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win -p always",
     "build:mac": "npm run build && electron-builder --mac",
@@ -24,6 +23,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "@lzwme/m3u8-dl": "^0.0.9",
     "@vicons/ionicons5": "^0.12.0",
     "@vueuse/electron": "^10.9.0",
     "animate.css": "^4.1.1",

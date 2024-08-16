@@ -357,7 +357,7 @@ const OnClickSearch = () => {
                   </div>
                 </div>
               </div>
-              <div class="accountPmc_Card accountPmc_Card_row ">
+              <div v-show="false" class="accountPmc_Card accountPmc_Card_row ">
                 <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
                      style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
@@ -366,7 +366,7 @@ const OnClickSearch = () => {
                   </div>
                 </div>
               </div>
-              <div class="accountPmc_Card accountPmc_Card_row ">
+              <div v-show="false" class="accountPmc_Card accountPmc_Card_row ">
                 <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
                      style="justify-content: flex-start">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
@@ -395,7 +395,7 @@ const OnClickSearch = () => {
               </div>
             </n-popover>
           </div>
-          <div class="Binarylinkage" style="width: 15%">
+          <div v-show="false" class="Binarylinkage" style="width: 15%">
             <n-popover trigger="hover">
               <template #trigger>
                 <div>

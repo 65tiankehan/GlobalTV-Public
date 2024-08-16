@@ -68,6 +68,7 @@ function createWindow(): void {
     }
   })
 
+
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
@@ -84,6 +85,13 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  //开展更新窗口
+  ipcMain.on('openUpdate',() => {
+    mainWindow.setSize(1010, 667);
+    mainWindow.resizable = false;
+    mainWindow.center()
+  })
 
   ipcMain.on('closeWin', () => {
     mainWindow.destroy()
@@ -154,7 +162,8 @@ function createWindow(): void {
 
     //通知渲染线程，更新进度
     BrowserWindow.getAllWindows().forEach((win) => {
-      win.webContents.send('download-progress-r', `当前进度: (${progressObj.transferred} / ${progressObj.total}) 下载速度: ${progressObj.bytesPerSecond}`
+      const percentage = (progressObj.transferred/progressObj.total) *100;
+      win.webContents.send('download-progress-r', percentage.toFixed(2)
     )
     })
   })

@@ -19,7 +19,7 @@ const intervalId = setInterval(() => {
   } else {
     isDisplay.value = true
     clearInterval(intervalId)
-    console.log('跳转')
+
     router.push({ path: '/load' }) // 修改这里
   }
 }, 100) // 每1000毫秒执行一次

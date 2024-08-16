@@ -8,5 +8,10 @@ export default [
     path: '/load',
     name: 'load',
     component: () => import('../components/Layout.vue')
+  },
+  {
+    path: '/Update',
+    name: 'Update',
+    component: () => import('../components/ProductUpdatePage.vue')
   }
 ]

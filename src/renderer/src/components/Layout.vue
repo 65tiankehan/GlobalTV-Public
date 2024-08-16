@@ -18,6 +18,7 @@ import axios from 'axios'
 import * as cheerio from 'cheerio'
 
 import { computed, ref, watch, onBeforeMount, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 interface Notice {
   title: string,
@@ -79,6 +80,7 @@ function resetDramaDetails() {
 
 const showModel = ref(false)
 const store = useStore()
+const router = useRouter()
 
 const paginationState = ref(false)
 
@@ -135,10 +137,7 @@ const setpage = (url: number) => {
 const setshowUpdate = (showUpdate: boolean) => {
   store.commit('SET_SHOWUPDATE', showUpdate)
 }
-// 使用store.commit来调用mutation
-const setNotices = (notices: Notice[]) => {
-  store.commit('SET_NOTICES', notices)
-}
+
 
 // 使用store.commit来调用mutation
 const setPlayStarted = (PlayStarted: boolean) => {
@@ -167,10 +166,11 @@ const cancelUpdate = () => {
 
 //开始更新
 const startUpdate = () => {
-  message.info('开始更新')
-  window.electron.ipcRenderer.send('check-for-update')
   setshowUpdate(false)
-
+  //先，通知主进程，修改窗口大小，变成更新窗口所需大小
+  window.electron.ipcRenderer.send('openUpdate')
+  //在切换页面
+  router.push({ path: '/Update' })
 }
 
 //得到详情地址，去除地址中的${及其后面的字符串，返回剩于字符串
@@ -182,45 +182,7 @@ function extractBeforeDollarBrace(str: string): string {
   return str // 如果没有找到 '${'，返回原始字符串
 }
 
-//睡眠
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
 
-//封装睡眠
-async function SleepForUpdates(ms: number) {
-  await sleep(ms)
-}
-
-//接受来自主进程更新事件
-window.electron.ipcRenderer.on('update-downloaded', (_event, info) => {
-  console.log('Received update-downloaded event:', info.version)
-
-  // 在这里处理版本信息，例如显示在 UI 上
-  notices.value.push({
-    title: '版本更新',
-    message: info.version + '版本更新完成！'
-  })
-
-  setNotices(notices.value)//往消息队列Notices发送消息
-  message.loading('应用更新完成！稍后将自行重启！', { duration: 1500 })//全局提升
-  SleepForUpdates(8000)//停顿3秒
-  //通知主进程重启更新
-  window.electron.ipcRenderer.send('check-for-update-yes')
-
-  //
-})
-
-//接受来自主进程的更新失败事件
-window.electron.ipcRenderer.on('update-downloaded-err', (_event, info) => {
-  console.log('Received update-downloaded-err event:', info)
-  message.error('更新失败！' + info, { duration: 1500 })
-})
-
-//接受来自主进程的更新进度
-window.electron.ipcRenderer.on('download-progress-r', (_event, info) => {
-  message.loading('应用更新：' + info, { duration: 1500 })
-})
 
 
 //随机返回标签颜色

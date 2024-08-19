@@ -442,6 +442,7 @@ onUnmounted(() => {
   <!-- 影片详情 -->
   <n-modal v-model:show="showModel">
     <n-card
+      class="space-card"
       style="width: 650px"
       :title="dramaDetails.title"
       :bordered="false"
@@ -473,12 +474,12 @@ onUnmounted(() => {
       <n-space justify="flex-start">
         <n-space>
 
-          <div style="height: 300px;width: 200px;padding: 5px;border-radius: 5px;  border: 1px dashed #3f3f44;">
+          <div class="space-Fax_img" style="height: 300px;width: 200px;padding: 5px;border-radius: 5px;  border: 1px dashed #3f3f44;">
             <img style="width: 100%;height: 100%"
                  :src="dramaDetails.imgUrl" />
           </div>
 
-          <div style="height: 300px;width: 350px">
+          <div class="space-Fax_dcrumb" style="height: 300px;width: 350px">
             <n-space vertical>
               <n-breadcrumb>
                 <n-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="index"> {{ item }}</n-breadcrumb-item>
@@ -506,7 +507,7 @@ onUnmounted(() => {
         </n-space>
         <n-space>
 
-          <div style="width: 570px;height: 300px">
+          <div class="space-Fax_stream" style="width: 570px;height: 300px">
             <n-tabs type="segment" animated>
               <n-tab-pane v-for="(item,index) in dramaDetails.streamingSources" :key="index" :name="item.name"
                           :tab="item.name">
@@ -535,6 +536,42 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+/* 当屏幕宽度至少为 400px 时 */
+@media (max-width: 620px) {
+  .space-card {
+    width: 200px !important;
+  }
+  .space-Fax_stream {
+    width: 130px !important;
+  }
+  .space-Fax_dcrumb {
+    display: none;
+  }
+  .space-Fax_img {
+    width: 130px !important;
+    height: 130px !important;
+  }
+  .left_layout {
+     display: none;
+  }
+  .right_layout {
+    display: none;
+  }
+  .center_layout {
+    width: 100% !important;
+    height: 100% !important;
+    float: none !important;
+  }
+}
+.space-Fax_dcrumb {
+
+}
+.space-card {
+
+}
+.space-Fax_stream {
+
+}
 .NeworldscroE {
   /* height: 430px; */
   overflow-y: auto;

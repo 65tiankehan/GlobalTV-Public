@@ -236,7 +236,7 @@ const OnBlur = () => {
 const OnClickSearch = () => {
   // 获取当前时间的时间戳
   const timestamp = Date.now()
-  setplayRoute(searchInputValue.value+ '${' + `${timestamp}`)
+  setplayRoute(searchInputValue.value + '${' + `${timestamp}`)
 }
 
 </script>
@@ -281,7 +281,7 @@ const OnClickSearch = () => {
           </n-button>
         </div>
       </div>
-      <div style="
+      <div class="TaskbarCenter" style="
           flex: 60%;
           display: flex;
           align-items: center;
@@ -305,7 +305,7 @@ const OnClickSearch = () => {
 
 
       </div>
-      <div style="flex: 20%">
+      <div class="TernarylinkageR" style="flex: 20%">
         <div class="Ternarylinkage">
           <div class="BinarylinkageGan" @click="ipcHandleClose">
             <svg t="1679034496978" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -516,6 +516,39 @@ const OnClickSearch = () => {
 </template>
 
 <style scoped>
+@media (max-width: 620px) {
+  .iconTitle {
+    display: none;
+  }
+  .titleText {
+    display: none;
+  }
+
+  .Ternarylinkage {
+    display: none;
+  }
+
+  .TernarylinkageR {
+    display: none;
+  }
+
+  .TaskbarCenter {
+    flex: 100% !important;
+    padding-top: 4px;
+  }
+  .animated-input.expanded {
+    width: 150px !important;
+  }
+}
+
+.TernarylinkageR {
+
+}
+
+.TaskbarCenter {
+
+}
+
 .animated-input {
   transition: width 0.5s ease-in-out;
   width: 130px;

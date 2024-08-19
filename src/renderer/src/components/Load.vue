@@ -56,5 +56,6 @@ const intervalId = setInterval(() => {
 .Load_layout {
   background-color: #222222;
   height: 100%;
+  border-radius: 10px;
 }
 </style>

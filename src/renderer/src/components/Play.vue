@@ -576,7 +576,14 @@ const preparelocalPlayUrl = () => {
 </template>
 
 <style scoped>
-
+@media (max-width: 620px) {
+  .right_layout {
+    display: none;
+  }
+  .center_layout {
+    width: 100% !important;
+  }
+}
 .NeworldscroE {
 
   width: 100%;

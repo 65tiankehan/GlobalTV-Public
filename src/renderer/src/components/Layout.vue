@@ -123,6 +123,7 @@ const versionDescriptions = computed(() => store.getters.getVersionDescriptions)
 // 直接从 store 访问状态，这个是分类起始地址，当改变时，会触发计算属性的 getter
 const playRoute = computed(() => store.state.playRoute)
 
+
 // 使用store.commit来调用mutation
 const setplayVideoType = (url: string) => {
   store.commit('SET_PAYVIDEOTYPE', url)
@@ -330,6 +331,9 @@ watch(breadcrumbs, (newVal, oldVal) => {
 
 
 })
+
+
+
 
 
 onBeforeMount(() => {

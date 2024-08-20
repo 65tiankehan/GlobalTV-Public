@@ -179,7 +179,9 @@ watch(playAddress2, (newVal, oldVal) => {
 
 //改变选项卡目录
 const mountedOptionLists = (value: string, setbreadcrumb: string[], page: number, total: number, PaginationUrl: string, index: number) => {
-  setplayVideoType(value)
+  // 获取当前时间的时间戳
+  const timestamp = Date.now()
+  setplayVideoType(value + '${' + `${timestamp}`)
   setbreadcrumbs(setbreadcrumb)
   setpage(page)
   settotal(total)

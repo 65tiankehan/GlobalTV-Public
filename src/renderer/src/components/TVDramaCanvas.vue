@@ -12,6 +12,7 @@ import { ref, computed, watch } from 'vue'
 import axios from 'axios'
 import { useMessage } from 'naive-ui'
 import { useStore } from 'vuex'
+import IndexedDBManager from '../indexedDB.js'
 
 
 import {
@@ -37,11 +38,11 @@ interface tvDrama {
   download?: boolean,
   Progress: number,
   prompt?: string,
-  prompt2?: string
+  prompt2?: string,
+  favorites?: boolean
 }
 
 const store = useStore()
-
 
 
 // 使用computed属性来访问getter
@@ -51,30 +52,39 @@ const payVideoUrl = computed(() => store.getters.getPayVideoUrl)
 const playVideoType = computed(() => store.state.playVideoType)
 
 // 使用computed属性来访问getter
-const notices = computed(() => store.getters.getNotices)
+// const notices = computed(() => store.getters.getNotices)
 
-// 直接从 store 访问状态，这个是分类起始地址，当改变时，会触发计算属性的 getter
+// 直接从 store 访问状态，这个是搜索，当改变时，会触发计算属性的 getter
 const playRoute = computed(() => store.state.playRoute)
 
-// 使用store.commit来调用mutation
-// const setPayVideoUrl = (url: string) => {
-//   store.commit('SET_PAYVIDEOURL', url)
-// }
+// 直接从 store 访问状态，这个是历史，当改变时，会触发计算属性的 getter
+const History = computed(() => store.state.History)
 
+// 直接从 store 访问状态，这个是收藏，当改变时，会触发计算属性的 getter
+const Favorite = computed(() => store.state.Favorite)
 
-// 使用store.commit来调用mutation
-const setNotices = (notices: Notice[]) => {
-  store.commit('SET_NOTICES', notices)
-}
+// 使用computed属性来访问getter
+const breadcrumbs = computed(() => store.getters.getBreadcrumbs)
 
 // 使用store.commit来调用mutation
 const setVideoDetailsLoading = (url: string) => {
   store.commit('SET_VIDEODETAILSLOADING', url)
 }
 
+const setpage = (page: number) => {
+  store.commit('SET_PAGE', page)
+}
+
+
+const settotal = (total: number) => {
+  store.commit('SET_TOTAL', total)
+}
+
+const dbManager = new IndexedDBManager()
 
 const NeworldscroE = ref<HTMLElement | null>(null)
 const journalismList = ref<tvDrama[]>([])
+const FavoritesList = ref<tvDrama[]>([])
 const message = useMessage()
 
 const totalSUrlElX = ref<string>('')
@@ -82,6 +92,7 @@ const totalSUrlElX = ref<string>('')
 const typeUrlIpX = ref('')
 const LatestMovies = ref([])
 const tuplesX = ref([])
+
 
 //得到详情地址，去除地址中的${及其后面的字符串，返回剩于字符串
 function extractBeforeDollarBrace(str: string): string {
@@ -98,12 +109,12 @@ watch(playVideoType, (newVal, oldVal) => {
   if (NeworldscroE.value) {//将页面滚动到顶部
     NeworldscroE.value.scrollTop = 0
   }
-  if (newVal === payVideoUrl.value) {//如果一级目录点击首页，那就调用首页代码
+  if (extractBeforeDollarBrace(newVal) === payVideoUrl.value) {//如果一级目录点击首页，那就调用首页代码
+    console.log('调用首页')
     fetchMovies()
   } else {
-    console.log(payVideoUrl.value + playVideoType.value)
     axios
-      .get(payVideoUrl.value + playVideoType.value)
+      .get(payVideoUrl.value + extractBeforeDollarBrace(playVideoType.value))
       .then((resp) => {
         message.loading('正在加载影视数据（已显示数据为准）', { duration: 1500 })
         journalismList.value = []
@@ -143,13 +154,13 @@ watch(playVideoType, (newVal, oldVal) => {
       }).catch((err) => {
       console.log(err)
     })
-  }
 
+  }
 })
 
 // 监听 playRoute 的变化,刷新journalismList（搜索）
 watch(playRoute, (newVal, oldVal) => {
-  console.log('playVideoType changed from', oldVal, 'to', newVal)
+  console.log('playRoute changed from', oldVal, 'to', newVal)
   if (NeworldscroE.value) {//将页面滚动到顶部
     NeworldscroE.value.scrollTop = 0
   }
@@ -198,14 +209,33 @@ watch(playRoute, (newVal, oldVal) => {
       }).catch((err) => {
       console.log(err)
     })
-  }
 
+  }
+})
+
+// 监听Favorite的变化，刷新journalismList（收藏）
+watch(Favorite, (newVal, oldVal) => {
+  console.log('Favorite changed from', oldVal, 'to', newVal)
+  if (newVal.includes('Clear')) {
+    clearFavorite()
+  } else {
+    getFavorites()
+  }
+})
+// 监听History的变化，刷新journalismList（历史）
+watch(History, (newVal, oldVal) => {
+  console.log('History changed from', oldVal, 'to', newVal)
+  if (newVal.includes('Clear')) {
+    clearHistory()
+  } else {
+    getHistorys()
+  }
 })
 
 
 const fetchMovies = () => {
 
-  totalSUrlElX.value = payVideoUrl.value
+  totalSUrlElX.value = extractBeforeDollarBrace(payVideoUrl.value)
   typeUrlIpX.value = ''
   message.loading('正在加载影视数据（已显示数据为准）', { duration: 1500 })
   axios
@@ -247,83 +277,159 @@ const fetchMovies = () => {
       // eslint-disable-next-line vue/no-ref-as-operand
       journalismList.value = arrx
       message.success('刷新成功！', { duration: 1500 })
+
     })
     .catch((err) => {
       console.log(err)
     })
+
+
 }
 fetchMovies()
 
-let progressInterval: NodeJS.Timeout | null = null
-
-const triggerFileDownload = (index: number) => {
-
-  journalismList.value[index].Progress == 100 ? 0 : journalismList.value[index].Progress
-  //不在100或0范围不需要重新给download标记重新赋值
-  if (!(journalismList.value[index].Progress != 100 && journalismList.value[index].Progress != 0)) {
-    journalismList.value[index].download = !journalismList.value[index].download // 假设download是一个布尔值，指示是否开始下载
-  }
-  if (journalismList.value[index].download == false) {
-    stopProgressAnimation()
-  }
-  startProgressAnimation(index)
-}
-
-const startProgressAnimation = (index: number) => {
-  if (progressInterval !== null) {
-    clearInterval(progressInterval as NodeJS.Timeout)
-  }
-  progressInterval = setInterval(() => {
-    if (journalismList.value[index].Progress >= 100) {
-      const now = new Date()
-      const year = now.getFullYear()
-      const month = String(now.getMonth() + 1).padStart(2, '0')
-      const day = String(now.getDate()).padStart(2, '0')
-      const hours = String(now.getHours()).padStart(2, '0')
-      const minutes = String(now.getMinutes()).padStart(2, '0')
-      const seconds = String(now.getSeconds()).padStart(2, '0') // 新增对秒的处理
-      notices.value.push({
-        title: String(journalismList.value[index].name),
-        message: `${year}/${month}/${day} ${hours}:${minutes}:${seconds}` + ' 时刻，下载完成！'
-      })
-      setNotices(notices.value)
-      journalismList.value[index].download = false
-      journalismList.value[index].Progress = 0
-      clearInterval(progressInterval as NodeJS.Timeout)
-      progressInterval = null
-      return
-    }
-
-    // 每次增加的进度值，这里是每100毫秒增加一次，共10秒，所以总共增加100次，每次增加1
-    journalismList.value[index].Progress += 1
-
-    //下载的时候得访问：www.yydstv.net，通过将例子：https://www.yyds.one/down/252405-1-1.html，换成www.yydstv.net/d/252405-1-1.html,就可以访问到资源下载地址
-    //每个影视资源，下载都需要创建一个文件夹，这个文件夹的名称就是影视名称，文件夹里是各种线路下，所下载的资源
-
-  }, 100) // 每100毫秒调用一次
-}
-
-// 如果有需要停止动画的情况，可以调用
-const stopProgressAnimation = () => {
-  if (progressInterval !== null) {
-    clearInterval(progressInterval as NodeJS.Timeout)
-    progressInterval = null
-  }
-}
-
+setInterval(setFavoritesList, 10000) // 每10秒检查一次(收藏)
 //通知Layout进入详情加载
-const showDetails = (url: string | undefined) => {
+const showDetails = (url: string | undefined, index: number) => {
 
   if (url) {
     // 获取当前时间的时间戳
     const timestamp = Date.now()
     setVideoDetailsLoading(url + '${' + `${timestamp}`)
+    setHistory(index)
   } else {
     console.log('')
   }
 
 }
 
+
+//清空历史记录
+async function clearHistory() {
+  await dbManager.delete('history')
+  if (breadcrumbs.value[0] == '历史记录') {
+    journalismList.value = []
+  }
+  message.success('清空历史记录成功！', { duration: 1500 })
+}
+
+//清空收藏
+async function clearFavorite() {
+  await dbManager.delete('favorites')
+  if (breadcrumbs.value[0] == '收藏夹') {
+    journalismList.value = []
+  }
+  message.success('清空收藏成功！', { duration: 1500 })
+}
+
+//往历史，插入一个值
+async function setHistory(index: number) {
+  let history = await dbManager.get('history')
+  const arrx: tvDrama[] = history?.inventory || []
+
+  // 如果`history`不存在，则创建一个新的`history`对象
+  if (!history) {
+    history = { id: 'history', inventory: arrx }
+    await dbManager.add(history)
+  } else {
+    // 如果`history`已存在，则直接修改`inventory`
+    const itemToAdd = journalismList.value[index]
+    const exists = arrx.some(item => item.name === itemToAdd.name)
+
+    if (!exists) {
+      arrx.unshift(itemToAdd)
+      history.inventory = arrx
+    }
+  }
+  // 更新`history`对象
+  await dbManager.update(history.id, history)
+
+}
+
+//往收藏，插入一个值
+async function setFavorite(index: number) {
+  let history = await dbManager.get('favorites')
+  const arrx: tvDrama[] = history?.inventory || []
+
+  // 如果`favorites`不存在，则创建一个新的`favorites`对象
+  if (!history) {
+    history = { id: 'favorites', inventory: arrx }
+    await dbManager.add(history)
+  } else {
+    // 如果`favorites`已存在，则直接修改`inventory`
+    const itemToAdd = journalismList.value[index]
+    const exists = arrx.some(item => item.name === itemToAdd.name)
+
+    if (!exists) {
+      journalismList.value[index].favorites = true
+      arrx.unshift(itemToAdd)
+      history.inventory = arrx
+    }
+  }
+  // 更新`favorites`对象
+  await dbManager.update(history.id, history)
+
+}
+
+//查询所有历史记录
+async function getHistorys() {
+  const history = await dbManager.get('history')
+
+  journalismList.value = history?.inventory || []
+
+  // 计算页数
+  // if (journalismList.value.length > 0) {
+  //   const pageCount = Math.ceil(journalismList.value.length / 48)
+  //   const adjustedPageCount = pageCount > 0 ? pageCount : 1
+  //   setpage(1)
+  //   settotal(adjustedPageCount)
+  // }
+  setpage(1)
+  settotal(0)
+}
+
+//查询所有收藏记录
+async function getFavorites() {
+  const history = await dbManager.get('favorites')
+
+  journalismList.value = history?.inventory || []
+  // 计算页数
+  // if (journalismList.value.length > 0) {
+  //   const pageCount = Math.ceil(journalismList.value.length / 48)
+  //   const adjustedPageCount = pageCount > 0 ? pageCount : 1
+  //   setpage(1)
+  //   settotal(adjustedPageCount)
+  // }
+  setpage(1)
+  settotal(0)
+}
+
+
+//从收藏中删除一个值
+async function removeFavorite(index: number) {
+  const history = await dbManager.get('favorites')
+  const arrx: tvDrama[] = history?.inventory || []
+  const itemToAdd = journalismList.value[index]
+  const exists = arrx.some(item => item.name === itemToAdd.name)
+  if (exists) {
+    const indexToRemove = arrx.findIndex(item => item.name === itemToAdd.name)
+    arrx.splice(indexToRemove, 1)
+    // 更新 `journalismList` 中的收藏状态
+    journalismList.value[index].favorites = false
+  }
+  // 更新`favorites`对象
+  await dbManager.update(history.id, history)
+}
+
+//设置收藏列表（）
+async function setFavoritesList() {
+  const history = await dbManager.get('favorites')
+
+  FavoritesList.value = history?.inventory || []
+}
+
+const isFavorites = (name: string) => {
+  return FavoritesList.value.some(item => item.name === name)
+}
 </script>
 
 <template>
@@ -378,13 +484,33 @@ const showDetails = (url: string | undefined) => {
 
           </div>
           <div style="position: absolute; z-index: 3; top: 5px; right: 8px">
-            <n-button text style="font-size: 24px" @click="triggerFileDownload(index)">
-<!--              <n-icon>-->
-<!--                <logo-markdown />-->
-<!--              </n-icon>-->
-              <svg t="1723794290414" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="17077" width="24" height="24"><path d="M512 912c-220.6 0-400-179.4-400-400s179.4-400 400-400 400 179.4 400 400-179.4 400-400 400z m0-704.3c-167.8 0-304.3 136.5-304.3 304.3S344.2 816.3 512 816.3s304.3-136.5 304.3-304.3S679.8 207.7 512 207.7z" fill="#1296db" opacity=".8" p-id="17078" data-spm-anchor-id="a313x.search_index.0.i14.45e53a81hMAcyj" class="selected"></path><path d="M514.3 734.9c-26.4 0-47.8-21.4-47.8-47.8V336.9c0-26.4 21.4-47.8 47.8-47.8s47.8 21.4 47.8 47.8V687c0 26.5-21.4 47.9-47.8 47.9z" fill="#169F65" opacity=".8" p-id="17079"></path><path d="M510.1 734.9c-12.7 0-25.3-5-34.7-14.9L357.5 595.8c-18.2-19.2-17.4-49.4 1.8-67.6 19.2-18.2 49.4-17.4 67.6 1.8l117.9 124.2c18.2 19.2 17.4 49.4-1.8 67.6a47.9 47.9 0 0 1-32.9 13.1z" fill="#169F65" opacity=".8" p-id="17080"></path><path d="M513.9 734.9a47.9 47.9 0 0 1-32.9-13.1c-19.2-18.2-19.9-48.5-1.8-67.6L597.1 530c18.2-19.2 48.5-19.9 67.6-1.8 19.2 18.2 19.9 48.5 1.8 67.6L548.6 720c-9.4 9.9-22.1 14.9-34.7 14.9z" fill="#169F65" opacity=".8" p-id="17081"></path></svg>
+            <div v-if="isFavorites(item.name??'') || item.favorites">
+              <!--              收藏-->
+              <n-button text style="font-size: 24px" @click="removeFavorite(index)">
 
-            </n-button>
+                <svg t="1724123586058" class="icon" viewBox="0 0 1025 1024" version="1.1"
+                     xmlns="http://www.w3.org/2000/svg" p-id="4722" width="24" height="24">
+                  <path
+                    d="M1024.049737 393.508571a36.571429 36.571429 0 0 0-29.257143-24.868571l-311.588571-44.617143L544.232594 42.422857a37.302857 37.302857 0 0 0-64.365714 0l-138.971429 281.6L30.769737 365.714286a36.571429 36.571429 0 0 0-29.257143 24.868571 36.571429 36.571429 0 0 0 9.508572 36.571429l224.548571 219.428571-53.394286 311.588572a36.571429 36.571429 0 0 0 14.628572 35.108571 35.108571 35.108571 0 0 0 21.211428 6.582857 33.645714 33.645714 0 0 0 16.091429-4.388571l277.942857-146.285715 277.942857 146.285715a34.377143 34.377143 0 0 0 37.302857 0 36.571429 36.571429 0 0 0 14.628572-35.108572l-53.394286-309.394285 224.548572-219.428572a36.571429 36.571429 0 0 0 10.971428-38.034286z"
+                    fill="#be9bf4" p-id="4723" data-spm-anchor-id="a313x.search_index.0.i10.662f3a81RygkFl"
+                    class="selected"></path>
+                </svg>
+
+              </n-button>
+            </div>
+            <div v-else>
+              <!--  未收藏-->
+              <n-button text style="font-size: 24px" @click="setFavorite(index)">
+
+                <svg t="1724123613409" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                     xmlns="http://www.w3.org/2000/svg" p-id="4974" width="24" height="24">
+                  <path
+                    d="M324.57 903.539c-21.306 0-42.516-6.729-60.642-19.809-32.045-23.264-47.744-61.947-41.11-101.004l22.423-130.623c2.619-15.324-2.427-30.926-13.545-41.762l-94.932-92.506c-28.404-27.654-38.4-68.204-26.161-105.855 12.241-37.658 44.195-64.566 83.344-70.265l131.183-19.061a47.304 47.304 0 0 0 35.6-25.79l58.675-118.848c17.564-35.507 52.977-57.557 92.595-57.557 39.614 0 75.122 22.05 92.591 57.557l58.681 118.848c3.083 6.259 7.381 11.68 12.893 15.978 6.542 5.231 14.389 8.595 22.705 9.813l131.184 18.965c39.148 5.698 71.102 32.61 83.343 70.265 12.24 37.656 2.24 78.204-26.165 105.86l-94.926 92.501c-11.118 10.84-16.164 26.443-13.55 41.768l22.423 130.621c6.729 39.053-9.06 77.736-41.11 101.004-32.045 23.262-73.722 26.256-108.759 7.848l-117.35-61.668a47.373 47.373 0 0 0-43.916 0l-117.355 61.668c-15.138 8.128-31.677 12.052-48.119 12.052z m187.521-727.204c-18.403 0-34.193 9.809-42.323 26.347l-58.679 118.852c-15.042 30.457-44.099 51.575-77.737 56.526l-131.183 19.062c-18.222 2.618-32.419 14.671-38.122 32.14-5.699 17.474-1.214 35.601 11.962 48.401l94.927 92.5c24.39 23.732 35.412 57.932 29.713 91.381l-22.423 130.623c-3.084 18.125 3.923 35.412 18.778 46.156 14.859 10.838 33.45 12.145 49.71 3.549l117.354-61.668c30.083-15.791 66.056-15.791 96.139 0l117.355 61.668c16.26 8.596 34.851 7.195 49.71-3.549 14.854-10.842 21.862-28.031 18.777-46.156l-22.423-130.623c-5.794-33.545 5.324-67.648 29.714-91.381l94.927-92.5c13.176-12.801 17.661-30.928 11.962-48.401-5.702-17.469-19.905-29.521-38.122-32.14L690.831 378.06c-18.126-2.615-35.221-10.087-49.61-21.488a104.823 104.823 0 0 1-28.217-35.038L554.42 202.682c-8.13-16.538-24.016-26.347-42.329-26.347z m0 0"
+                    fill="#BE9BF4" p-id="4975"></path>
+                </svg>
+
+              </n-button>
+            </div>
           </div>
           <div
             class="play_video"
@@ -396,7 +522,7 @@ const showDetails = (url: string | undefined) => {
               z-index: 3;
             "
           >
-            <n-button text style="font-size: 24px" @click="showDetails(item.moviesImgUrl)">
+            <n-button text style="font-size: 24px" @click="showDetails(item.moviesImgUrl,index)">
               <n-icon>
                 <logoGoogle-playstore />
               </n-icon>

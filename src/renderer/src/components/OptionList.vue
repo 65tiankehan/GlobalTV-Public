@@ -53,14 +53,16 @@ const playAddress1 = computed(() => store.getters.getPlayAddress1)
 // 使用computed属性来访问getter
 const payVideoUrl = computed(() => store.getters.getPayVideoUrl)
 //改变选项卡目录
-const mountedOptionLists = (value: string, setbreadcrumb: string[], index: number,key:string,page:number,total:number,PaginationUrl:string) => {
-  setplayVideoType(value)
+const mountedOptionLists = (value: string, setbreadcrumb: string[], index: number, key: string, page: number, total: number, PaginationUrl: string) => {
+  // 获取当前时间的时间戳
+  const timestamp = Date.now()
+  setplayVideoType(value + '${' + `${timestamp}`)
   setbreadcrumbs(setbreadcrumb)
   setplayAddress1(index)
   setplayAddress2(Number(key))
   setpage(page)
   settotal(total)
-  setPaginationUrl(PaginationUrl);
+  setPaginationUrl(PaginationUrl)
 }
 
 </script>
@@ -156,7 +158,9 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], index: numbe
 
         <div v-for="(item, index) in sites" :key="index"
              class="accountPmc_Card accountPmc_Card_row animate__animated animate__backInLeft">
-          <div @click="mountedOptionLists(item.url,item.breadcrumb,index,item.key,item.Pagination.page,item.Pagination.total,item.PaginationUrl)" :class="index == playAddress1
+          <div
+            @click="mountedOptionLists(item.url,item.breadcrumb,index,item.key,item.Pagination.page,item.Pagination.total,item.PaginationUrl)"
+            :class="index == playAddress1
             ? 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
             : 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height '
             " style="justify-content: flex-start">
@@ -208,6 +212,7 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], index: numbe
 }
 
 .accountPmc_Card_P {
+
   width: 230px;
   height: 220px;
   background-color: rgb(39, 39, 39);

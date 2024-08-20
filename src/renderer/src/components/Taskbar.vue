@@ -95,6 +95,22 @@ const setplayRoute = (playRoute: string) => {
   store.commit('SET_PLAYROUTE', playRoute)
 }
 
+// 使用store.commit来调用mutation
+const setHistory = (History: string) => {
+  store.commit('SET_HISTORY', History)
+}
+
+const setbreadcrumbs = (setbreadcrumb: string[]) => {
+  store.commit('SET_BREADCRUMBS', setbreadcrumb)
+}
+
+const setFavorite = (Favorite: string) => {
+  store.commit('SET_FAVORITE', Favorite)
+}
+
+
+
+
 const versionB = ref('')
 
 
@@ -239,6 +255,33 @@ const OnClickSearch = () => {
   setplayRoute(searchInputValue.value + '${' + `${timestamp}`)
 }
 
+//得到历史记录
+async function getHistory() {
+  // 获取当前时间的时间戳
+  const timestamp = Date.now()
+  setHistory('${' + `${timestamp}`)
+  setbreadcrumbs(['历史记录'])
+
+}
+//清空历史记录
+async function clearHistory() {
+  // 获取当前时间的时间戳
+  const timestamp = Date.now()
+  setHistory('Clear${' + `${timestamp}`)
+}
+
+async function getFavorite() {
+  // 获取当前时间的时间戳
+  const timestamp = Date.now()
+  setFavorite('${' + `${timestamp}`)
+  setbreadcrumbs(['收藏夹'])
+}
+//清空收藏
+async function clearFavorite() {
+  // 获取当前时间的时间戳
+  const timestamp = Date.now()
+  setFavorite('Clear${' + `${timestamp}`)
+}
 </script>
 
 <template>
@@ -363,6 +406,42 @@ const OnClickSearch = () => {
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>打开下载视频</span>
                     <n-button size="tiny">查看</n-button>
+                  </div>
+                </div>
+              </div>
+              <div class="accountPmc_Card accountPmc_Card_row ">
+                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                     style="justify-content: flex-start; height: 250px">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between">
+                    <span>历史记录</span>
+                    <n-button size="tiny" @click="getHistory">查看</n-button>
+                  </div>
+                </div>
+              </div>
+              <div class="accountPmc_Card accountPmc_Card_row ">
+                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                     style="justify-content: flex-start; height: 250px">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between">
+                    <span>清空历史记录</span>
+                    <n-button size="tiny" @click="clearHistory">清空</n-button>
+                  </div>
+                </div>
+              </div>
+              <div class="accountPmc_Card accountPmc_Card_row ">
+                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                     style="justify-content: flex-start; height: 250px">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between">
+                    <span>我的收藏</span>
+                    <n-button size="tiny" @click="getFavorite">查看</n-button>
+                  </div>
+                </div>
+              </div>
+              <div class="accountPmc_Card accountPmc_Card_row ">
+                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
+                     style="justify-content: flex-start; height: 250px">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between">
+                    <span>清空收藏</span>
+                    <n-button size="tiny" @click="clearFavorite">清空</n-button>
                   </div>
                 </div>
               </div>
@@ -520,6 +599,7 @@ const OnClickSearch = () => {
   .iconTitle {
     display: none;
   }
+
   .titleText {
     display: none;
   }
@@ -536,6 +616,7 @@ const OnClickSearch = () => {
     flex: 100% !important;
     padding-top: 4px;
   }
+
   .animated-input.expanded {
     width: 150px !important;
   }

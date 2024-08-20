@@ -38,7 +38,9 @@ export default createStore({
       smartRoutePaths: [{
         localPath: 'https://ml-tv.cc',
         path: 'https://ml-tv.cc/index.php/vod/search.html?wd='
-      }] as smartRoutePath[]//智能路由
+      }] as smartRoutePath[],//智能路由
+      History:'',//历史记录
+      Favorite:''//收藏
     }
   },
   getters: {
@@ -110,6 +112,12 @@ export default createStore({
     ,
     getSmartRoutePaths: (state) => {
       return state.smartRoutePaths
+    },
+    getHistory: (state) => {
+      return state.History
+    },
+    getFavorite: (state) => {
+      return state.Favorite
     }
 
   },
@@ -180,6 +188,12 @@ export default createStore({
     },
     SET_SMARTROUTEPATHS: (state, payload) => {
       state.smartRoutePaths = payload
+    },
+    SET_HISTORY: (state, payload) => {
+      state.History = payload
+    },
+    SET_FAVORITE: (state, payload) => {
+      state.Favorite = payload
     }
   }
 })

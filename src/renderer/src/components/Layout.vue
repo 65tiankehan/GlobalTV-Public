@@ -19,6 +19,7 @@ import * as cheerio from 'cheerio'
 
 import { computed, ref, watch, onBeforeMount, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import IndexedDBManager from '../indexedDB.js'
 
 interface Notice {
   title: string,
@@ -56,6 +57,8 @@ interface RemoteStartStop {
   switch?: boolean
 }
 
+const dbManager = new IndexedDBManager()
+
 const message = useMessage()
 
 // 创建一个 tvDrama 类型的变量
@@ -84,6 +87,8 @@ const router = useRouter()
 
 const paginationState = ref(false)
 
+const breadcrumbState = ref(false)
+
 // 使用computed属性来访问getter
 const breadcrumbs = computed(() => store.getters.getBreadcrumbs)
 
@@ -91,8 +96,6 @@ const breadcrumbs = computed(() => store.getters.getBreadcrumbs)
 // 使用computed属性来访问getter
 const payVideoUrl = computed(() => store.getters.getPayVideoUrl)
 
-// 直接从 store 访问状态，这个是分类起始地址，当改变时，会触发计算属性的 getter
-const playVideoType = computed(() => store.state.playVideoType)
 
 // 使用computed属性来访问getter
 const videoDetailsLoading = computed(() => store.getters.getVideoDetailsLoading)
@@ -123,6 +126,8 @@ const versionDescriptions = computed(() => store.getters.getVersionDescriptions)
 // 直接从 store 访问状态，这个是分类起始地址，当改变时，会触发计算属性的 getter
 const playRoute = computed(() => store.state.playRoute)
 
+// 使用computed属性来访问getter
+const skin = computed(() => store.getters.getSkin)
 
 // 使用store.commit来调用mutation
 const setplayVideoType = (url: string) => {
@@ -150,7 +155,9 @@ const setPlayStarted = (PlayStarted: boolean) => {
 const setStreamSource = (StreamSource: string) => {
   store.commit('SET_STREAMSOURCE', StreamSource)
 }
-
+const setskin = (skin: string) => {
+  store.commit('SET_SKIN', skin)
+}
 
 //发生了分页行为
 const pagination = (page: number) => {
@@ -182,8 +189,6 @@ function extractBeforeDollarBrace(str: string): string {
   }
   return str // 如果没有找到 '${'，返回原始字符串
 }
-
-
 
 
 //随机返回标签颜色
@@ -319,28 +324,34 @@ const checkForRemoteStartStop = async () => {
 
 // 监听 playRoute 的变化,禁用分页
 watch(playRoute, (newVal, oldVal) => {
-  console.log('playVideoType changed from', oldVal, 'to', newVal)
+  console.log('playRoute changed from', oldVal, 'to', newVal)
   paginationState.value = true
 
 
 })
 //监听 breadcrumbs的变化，启用分页
 watch(breadcrumbs, (newVal, oldVal) => {
-  console.log('playVideoType changed from', oldVal, 'to', newVal)
+  console.log('breadcrumbs changed from', oldVal, 'to', newVal)
   paginationState.value = false
 
+  if (newVal.length == 1 && newVal[0] === '首页') {
+    breadcrumbState.value = false
+  } else {
+    breadcrumbState.value = true
+  }
 
 })
 
-
-
-
-
+//当应用启动后，2秒后，检查皮肤，如果皮肤不存在，则使用默认皮肤，反之使用设置皮肤
+const checkSkin = async () => {
+  const skin = await dbManager.get('skin')
+  setskin(skin?.inventory || 'darkTheme')
+}
 onBeforeMount(() => {
   intervalId = setInterval(checkForUpdates, 60000) // 每分钟检查一次
 
   intervalId2 = setInterval(checkForRemoteStartStop, 60000)// 每分钟检查一次
-
+  setTimeout(checkSkin, 2000)
 
 })
 
@@ -357,7 +368,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div style="height: 100%; width: 100%">
+  <div :class="skin == 'darkTheme' ? 'layout' : 'layout_lightTheme' " style="height: 100%; width: 100%">
     <Taskbar />
     <!-- home -->
     <div style="width: 100%; height: 100%" v-show="PlayStarted == false">
@@ -386,7 +397,7 @@ onUnmounted(() => {
           <!--  表达排除首页 -->
 
           <n-pagination :page-slot="7" @update:page="pagination"
-                        v-if="(playVideoType != '' && playVideoType != payVideoUrl)"
+                        v-if="breadcrumbState"
                         v-model:page="page"
                         :page-count="total" show-quick-jumper :disabled="paginationState">
 
@@ -478,7 +489,8 @@ onUnmounted(() => {
       <n-space justify="flex-start">
         <n-space>
 
-          <div class="space-Fax_img" style="height: 300px;width: 200px;padding: 5px;border-radius: 5px;  border: 1px dashed #3f3f44;">
+          <div class="space-Fax_img"
+               style="height: 300px;width: 200px;padding: 5px;border-radius: 5px;  border: 1px dashed #3f3f44;">
             <img style="width: 100%;height: 100%"
                  :src="dramaDetails.imgUrl" />
           </div>
@@ -540,42 +552,62 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.layout_lightTheme {
+  background-color: #ffff;
+
+}
+
+.layout {
+  background-color: #1b1b1f;
+}
+
 /* 当屏幕宽度至少为 400px 时 */
 @media (max-width: 620px) {
   .space-card {
     width: 200px !important;
+
   }
+
   .space-Fax_stream {
     width: 130px !important;
   }
+
   .space-Fax_dcrumb {
     display: none;
   }
+
   .space-Fax_img {
     width: 130px !important;
     height: 130px !important;
   }
+
   .left_layout {
-     display: none;
+    display: none;
   }
+
   .right_layout {
     display: none;
   }
+
   .center_layout {
     width: 100% !important;
     height: 100% !important;
     float: none !important;
   }
 }
+
 .space-Fax_dcrumb {
 
 }
+
 .space-card {
 
 }
+
 .space-Fax_stream {
 
 }
+
 .NeworldscroE {
   /* height: 430px; */
   overflow-y: auto;

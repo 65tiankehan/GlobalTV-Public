@@ -7,16 +7,19 @@
  * @LastEditors: KeHan
 -->
 <script setup lang="ts">
+import { useStore } from 'vuex'
+import { computed } from 'vue'
+import { lightTheme, darkTheme } from 'naive-ui'
 
-import { darkTheme } from 'naive-ui'
-
-
+const store = useStore()
+// 使用computed属性来访问getter
+const skin = computed(() => store.getters.getSkin)
 </script>
 
 
 <template>
   <n-config-provider
-    :theme="darkTheme"
+    :theme="skin == 'darkTheme' ? darkTheme: lightTheme"
   >
     <n-notification-provider :placement="'bottom-right'">
       <n-modal-provider>

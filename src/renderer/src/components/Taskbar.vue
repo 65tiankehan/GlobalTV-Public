@@ -4,7 +4,7 @@ import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 import { ArrowUndoOutline as CashIcon } from '@vicons/ionicons5'
 import axios from 'axios'
-
+import IndexedDBManager from '../indexedDB.js'
 
 const loadingBar = useLoadingBar()
 const message = useMessage()
@@ -12,7 +12,7 @@ const dialog = useDialog()
 const notification = useNotification()
 const fileInput = ref<HTMLInputElement | null>(null)
 const store = useStore()
-
+const dbManager = new IndexedDBManager()
 
 const focusState = ref(false)
 const searchInputValue = ref('')
@@ -27,6 +27,9 @@ const PlayStarted = computed(() => store.getters.getPlayStarted)
 
 // 使用computed属性来访问getter
 const isSmartRouteEnabled = computed(() => store.getters.getIsSmartRouteEnabled)
+
+// 使用computed属性来访问getter
+const skin = computed(() => store.getters.getSkin)
 
 const ipcHandleMax = () => window.electron.ipcRenderer.send('MaxWin')
 const ipcHandleMin = () => window.electron.ipcRenderer.send('MinWin')
@@ -108,8 +111,9 @@ const setFavorite = (Favorite: string) => {
   store.commit('SET_FAVORITE', Favorite)
 }
 
-
-
+const setskin = (skin: string) => {
+  store.commit('SET_SKIN', skin)
+}
 
 const versionB = ref('')
 
@@ -230,6 +234,35 @@ const openUp = () => {
   window.electron.ipcRenderer.send('OpenExternal', 'https://space.bilibili.com/393402835/video')
 }
 
+//往skin，插入一个值
+async function SetOnSkin() {
+  let history = await dbManager.get('skin')
+
+  // 如果`skin`不存在，则创建一个新的`skin`对象
+  if (!history) {
+    history = { id: 'skin', inventory: '' }
+    await dbManager.add(history)
+  } else {
+    // 如果`history`已存在，则直接修改`inventory`
+
+    let skinL = ''
+    if (skin.value == 'lightTheme') {
+      skinL = 'darkTheme'
+      setskin('darkTheme')
+    } else {
+      skinL = 'lightTheme'
+      setskin('lightTheme')
+    }
+    // 如果`skin`已存在，则直接修改`skin`
+    history.inventory = skinL
+
+  }
+  // 更新`history`对象
+  await dbManager.update(history.id, history)
+
+}
+
+
 //返回，并清空播放地址
 const closePlayStarted = () => {
   setPlayStarted(false)
@@ -263,6 +296,7 @@ async function getHistory() {
   setbreadcrumbs(['历史记录'])
 
 }
+
 //清空历史记录
 async function clearHistory() {
   // 获取当前时间的时间戳
@@ -276,6 +310,7 @@ async function getFavorite() {
   setFavorite('${' + `${timestamp}`)
   setbreadcrumbs(['收藏夹'])
 }
+
 //清空收藏
 async function clearFavorite() {
   // 获取当前时间的时间戳
@@ -285,7 +320,7 @@ async function clearFavorite() {
 </script>
 
 <template>
-  <div id="titleLabel">
+  <div :class="skin =='lightTheme' ?'titleLabel_lightTheme':'titleLabel' ">
     <input ref="fileInput" type="file" accept=".mp4, video/mp4" multiple @change="onFileSelected"
            style="display: none;" />
     <input ref="fileInput2" type="file" accept=".mp4, video/mp4" multiple
@@ -311,7 +346,7 @@ async function clearFavorite() {
               fill="#495FA9" p-id="44250"></path>
           </svg>
         </div>
-        <div v-show="!PlayStarted" class="titleText">Global TV</div>
+        <div v-show="!PlayStarted" :class="skin == 'lightTheme' ? 'titleTextX' : 'titleText'">Global TV</div>
         <div v-show="PlayStarted">
           <n-button dashed circle ghost round style="  -webkit-app-region: no-drag;" size="small"
                     @click="closePlayStarted">
@@ -350,7 +385,7 @@ async function clearFavorite() {
       </div>
       <div class="TernarylinkageR" style="flex: 20%">
         <div class="Ternarylinkage">
-          <div class="BinarylinkageGan" @click="ipcHandleClose">
+          <div :class="skin =='lightTheme' ? 'BinarylinkageGanX' :'BinarylinkageGan' " @click="ipcHandleClose">
             <svg t="1679034496978" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
                  p-id="9573" width="15" height="15">
               <path
@@ -359,7 +394,7 @@ async function clearFavorite() {
             </svg>
           </div>
 
-          <div class="Binarylinkage" @click="ipcHandleMax">
+          <div :class="skin == 'lightTheme' ? 'BinarylinkageX' : 'Binarylinkage' " @click="ipcHandleMax">
             <svg t="1679034543228" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
                  p-id="10836" width="15" height="15">
               <path
@@ -367,14 +402,14 @@ async function clearFavorite() {
                 p-id="10837" fill="#8a8a8a"></path>
             </svg>
           </div>
-          <div class="Binarylinkage" @click="ipcHandleMin">
+          <div :class="skin == 'lightTheme' ? 'BinarylinkageX' : 'Binarylinkage' " @click="ipcHandleMin">
             <svg t="1679034573870" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
                  p-id="11924" width="15" height="15">
               <path d="M832 521.6H192c-19.2 0-32-12.8-32-32s12.8-32 32-32h640c19.2 0 32 12.8 32 32s-12.8 32-32 32z"
                     fill="#bfbfbf" p-id="11925"></path>
             </svg>
           </div>
-          <div class="Binarylinkage" style="width: 15%">
+          <div :class="skin == 'lightTheme' ? 'BinarylinkageX' : 'Binarylinkage' " style="width: 15%">
             <n-popover trigger="hover">
               <template #trigger>
                 <div>
@@ -392,8 +427,9 @@ async function clearFavorite() {
               </template>
               <!-- Blogger -->
               <div class="accountPmc_Card accountPmc_Card_row ">
-                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
-                     style="justify-content: flex-start; height: 250px">
+                <div
+                  :class="skin =='lightTheme' ?'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height':' accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height'"
+                  style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>打开本地视频播放</span>
                     <n-button size="tiny" @click="selectFiles">打开</n-button>
@@ -401,8 +437,9 @@ async function clearFavorite() {
                 </div>
               </div>
               <div v-show="false" class="accountPmc_Card accountPmc_Card_row ">
-                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
-                     style="justify-content: flex-start; height: 250px">
+                <div
+                  :class="skin =='lightTheme' ?'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height':' accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height'"
+                  style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>打开下载视频</span>
                     <n-button size="tiny">查看</n-button>
@@ -410,8 +447,9 @@ async function clearFavorite() {
                 </div>
               </div>
               <div class="accountPmc_Card accountPmc_Card_row ">
-                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
-                     style="justify-content: flex-start; height: 250px">
+                <div
+                  :class="skin =='lightTheme' ?'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height':' accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height'"
+                  style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>历史记录</span>
                     <n-button size="tiny" @click="getHistory">查看</n-button>
@@ -419,8 +457,9 @@ async function clearFavorite() {
                 </div>
               </div>
               <div class="accountPmc_Card accountPmc_Card_row ">
-                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
-                     style="justify-content: flex-start; height: 250px">
+                <div
+                  :class="skin =='lightTheme' ?'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height':' accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height'"
+                  style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>清空历史记录</span>
                     <n-button size="tiny" @click="clearHistory">清空</n-button>
@@ -428,8 +467,9 @@ async function clearFavorite() {
                 </div>
               </div>
               <div class="accountPmc_Card accountPmc_Card_row ">
-                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
-                     style="justify-content: flex-start; height: 250px">
+                <div
+                  :class="skin =='lightTheme' ?'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height':' accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height'"
+                  style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>我的收藏</span>
                     <n-button size="tiny" @click="getFavorite">查看</n-button>
@@ -437,8 +477,9 @@ async function clearFavorite() {
                 </div>
               </div>
               <div class="accountPmc_Card accountPmc_Card_row ">
-                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
-                     style="justify-content: flex-start; height: 250px">
+                <div
+                  :class="skin =='lightTheme' ?'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height':' accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height'"
+                  style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>清空收藏</span>
                     <n-button size="tiny" @click="clearFavorite">清空</n-button>
@@ -455,8 +496,9 @@ async function clearFavorite() {
                 </div>
               </div>
               <div class="accountPmc_Card accountPmc_Card_row ">
-                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
-                     style="justify-content: flex-start">
+                <div
+                  :class="skin =='lightTheme' ?'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height':' accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height'"
+                  style="justify-content: flex-start">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>启动智能线路</span>
                     <n-switch :value="isSmartRouteEnabled" :round="false" @update:value="intelligenceFun" />
@@ -464,8 +506,9 @@ async function clearFavorite() {
                 </div>
               </div>
               <div class="accountPmc_Card accountPmc_Card_row ">
-                <div class="accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height"
-                     style="justify-content: flex-start; height: 250px">
+                <div
+                  :class="skin =='lightTheme' ?'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height':' accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height'"
+                  style="justify-content: flex-start; height: 250px">
                   <div style="display: flex; align-items: flex-start; justify-content: space-between">
                     <span>当前版本：v{{ versionB }}</span>
                     <n-button size="tiny" @click="checkForUpdates">检查版本</n-button>
@@ -551,7 +594,7 @@ async function clearFavorite() {
               </div>
             </n-popover>
           </div>
-          <div class="Binarylinkage" style="width: 15%">
+          <div :class="skin == 'lightTheme' ? 'BinarylinkageX' : 'Binarylinkage' " style="width: 15%">
             <n-popover trigger="hover">
               <template #trigger v-if="notices.length > 0">
 
@@ -585,6 +628,34 @@ async function clearFavorite() {
                   <span>{{ item.message }}</span>
                 </n-alert>
               </n-space>
+
+            </n-popover>
+          </div>
+          <div :class="skin == 'lightTheme' ? 'BinarylinkageX' : 'Binarylinkage' " style="width: 15%">
+            <n-popover trigger="hover">
+              <template #trigger>
+                <div>
+                  <svg t="1724228351884" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                       xmlns="http://www.w3.org/2000/svg" p-id="6664" width="15" height="15">
+                    <path
+                      d="M490.3424 715.8272c-28.2624 0-51.2-22.9376-51.2-51.2v-119.6544c0-45.312 36.864-82.1248 82.1248-82.1248h305.92V286.2592h-79.0528c-28.2624 0-51.2-22.9376-51.2-51.2s22.9376-51.2 51.2-51.2h99.328c45.312 0 82.1248 36.864 82.1248 82.1248v217.088c0 45.312-36.864 82.1248-82.1248 82.1248h-305.92v99.4304c0 28.2624-22.9376 51.2-51.2 51.2z m357.12-429.568z"
+                      fill="#FFE37B" p-id="6665"></path>
+                    <path
+                      d="M686.8992 393.3184H198.5024c-51.6608 0-93.4912-41.8816-93.4912-93.4912v-129.536C105.0112 118.6816 146.8928 76.8 198.5024 76.8h488.3456c51.6608 0 93.4912 41.8816 93.4912 93.4912v129.536c0.0512 51.6096-41.8304 93.4912-93.44 93.4912zM539.8528 961.792H443.5456c-32.0512 0-58.0608-26.0096-58.0608-58.0608v-181.0432c0-32.0512 26.0096-58.0608 58.0608-58.0608h96.3072c32.0512 0 58.0608 26.0096 58.0608 58.0608v181.0432c0 32.0512-26.0096 58.0608-58.0608 58.0608z"
+                      fill="#8C7BFD" p-id="6666"></path>
+                  </svg>
+                </div>
+              </template>
+              <div class="accountPmc_Card accountPmc_Card_row ">
+                <div
+                  :class="skin =='lightTheme' ?'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height':' accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height'"
+                  style="justify-content: flex-start; height: 250px">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between">
+                    <span>{{ skin == 'lightTheme' ? '耀白' : '暗黑' }}</span>
+                    <n-button size="tiny" @click="SetOnSkin">切换</n-button>
+                  </div>
+                </div>
+              </div>
 
             </n-popover>
           </div>
@@ -642,6 +713,29 @@ async function clearFavorite() {
   width: 300px;
 }
 
+.BinarylinkageX {
+  width: 15%;
+  height: 28px;
+  /* background-color: aqua; */
+  /* padding-top: 10%; */
+  float: right;
+  padding: 6px;
+  /* margin-top: 6px; */
+  /* padding-top: 6px; */
+  text-align: center;
+  -webkit-app-region: no-drag;
+  margin-top: 4px;
+  border-radius: 5px;
+}
+
+.BinarylinkageX:hover {
+  box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.2);
+  border-color: #bfbfbf;
+  transition: all 0.2s ease-in-out;
+  background-color: #eeeeef;
+}
+
+
 .Binarylinkage {
   width: 15%;
   height: 28px;
@@ -664,11 +758,30 @@ async function clearFavorite() {
   background-color: #333333;
 }
 
+.BinarylinkageGanX {
+  width: 15%;
+  height: 28px;
+  float: right;
+  padding: 6px;
+  border-top-right-radius: 5px;
+  text-align: center;
+  -webkit-app-region: no-drag;
+  margin-top: 4px;
+  border-radius: 5px;
+  border-top-right-radius: 10px;
+  margin-right: 5px;
+}
+
+.BinarylinkageGanX:hover {
+  box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.2);
+  border-color: #eee;
+  transition: all 0.2s ease-in-out;
+  background-color: #dd1426;
+}
+
 .BinarylinkageGan {
   width: 15%;
   height: 28px;
-  /* background-color: aqua; */
-  /* padding-top: 10%; */
   float: right;
   padding: 6px;
   border-top-right-radius: 5px;
@@ -713,7 +826,30 @@ async function clearFavorite() {
   font-size: 13px;
 }
 
-#titleLabel {
+.titleTextX {
+  float: left;
+  margin-left: 15px;
+  color: #1b1a1a;
+}
+
+
+.titleLabel_lightTheme {
+  position: fixed;
+  z-index: 100;
+  height: 33px;
+  width: 99.9%;
+  top: 0;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  -webkit-app-region: drag;
+  background-color: #ffff;
+  border-top: 1px solid #efeff5;
+  border-left: 1px solid #efeff5;
+  border-right: 1px solid #efeff5;
+  color: #1c1c1c;
+}
+
+.titleLabel {
   position: fixed;
   z-index: 100;
   height: 33px;
@@ -725,6 +861,28 @@ async function clearFavorite() {
   background-color: #222222;
   border-top: 0.1px solid #4d4b4b;
   /* border-right: 0.1px solid #4d4b4b; */
+}
+
+.accountPmc_Card_PX {
+  width: 230px;
+  height: 220px;
+  background-color: #f4f5f5;
+  border: 1px solid #fafafc;
+  border-radius: 5px;
+  margin: 4px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  flex: 1 1 auto;
+  padding: 10px;
+  text-align: center;
+  transition: transform 0.3s,
+  box-shadow 0.3s !important;
+}
+
+.accountPmc_Card_PX:hover {
+
+  box-shadow: 0 0 10px rgba(66, 64, 64, 0.3);
+
 }
 
 .accountPmc_Card_P {
@@ -744,14 +902,9 @@ async function clearFavorite() {
 }
 
 .accountPmc_Card_P:hover {
-  /* box-shadow: 0 16px 32px 0 rgba(48, 55, 66, 0.15); */
 
-  /* transition-delay: 0s !important; */
-  /* border: 1px solid #78a4fa; */
-
-  /* transform: translateY(-10px)  !important; */
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-  /* animation: sparkle 0.5s infinite; */
+
 }
 
 .accountPmc_Card_P_d {

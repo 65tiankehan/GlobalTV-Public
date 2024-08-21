@@ -10,10 +10,11 @@ interface smartRoutePath {
   path?: string//线路，用于替代相关palyer**Url
 
 }
-
+//darkTheme  lightTheme
 export default createStore({
   state() {
     return {
+      skin:'lightTheme',
       view: 'v1',
       searchUrl: '',
       playAddress1: -1,//这个是一级目录选择值
@@ -44,6 +45,9 @@ export default createStore({
     }
   },
   getters: {
+    getSkin: (state) => {
+      return state.skin
+    },
     getView: (state) => {
       return state.view
     },
@@ -122,6 +126,9 @@ export default createStore({
 
   },
   mutations: {
+    SET_SKIN: (state, payload) => {
+      state.skin = payload
+    },
     SET_VIEW: (state, payload) => {
       state.view = payload
     },

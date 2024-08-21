@@ -45,7 +45,8 @@ const setPaginationUrl = (PaginationUrl: string) => {
 const setplayAddress2 = (playAddress2: number) => {
   store.commit('SET_PLAYADDRESS2', playAddress2)
 }
-
+// 使用computed属性来访问getter
+const skin = computed(() => store.getters.getSkin)
 
 // 使用computed属性来访问getter
 const playAddress1 = computed(() => store.getters.getPlayAddress1)
@@ -69,11 +70,11 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], index: numbe
 
 <template>
   <div class="optionList">
-    <div class="div2_Layout">
+    <div :class="skin == 'lightTheme' ? 'div2_LayoutX' :'div2_Layout' ">
       <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__backInLeft">
         <div @click="mountedOptionLists(payVideoUrl,['首页'],-1,'-1',1,0,'')" :class=" -1 == playAddress1
-            ? 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
-            : 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height '
+             ? skin == 'lightTheme' ? 'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_dX' :'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
+            : skin == 'lightTheme' ? 'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height ' : 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height '
             "
              style="justify-content: flex-start">
           <div style="display: flex; align-items: flex-start; justify-content: space-between">
@@ -161,8 +162,8 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], index: numbe
           <div
             @click="mountedOptionLists(item.url,item.breadcrumb,index,item.key,item.Pagination.page,item.Pagination.total,item.PaginationUrl)"
             :class="index == playAddress1
-            ? 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
-            : 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height '
+             ? skin == 'lightTheme' ? 'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_dX' :'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
+            : skin == 'lightTheme' ? 'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height ' : 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height '
             " style="justify-content: flex-start">
             <div style="display: flex; align-items: flex-start; justify-content: space-between">
               <n-button text style="font-size: 24px">
@@ -212,7 +213,6 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], index: numbe
 }
 
 .accountPmc_Card_P {
-
   width: 230px;
   height: 220px;
   background-color: rgb(39, 39, 39);
@@ -227,18 +227,46 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], index: numbe
   transition: transform 0.3s,
   box-shadow 0.3s !important;
 }
-
-.accountPmc_Card_P:hover {
-  /* box-shadow: 0 16px 32px 0 rgba(48, 55, 66, 0.15); */
-
-  /* transition-delay: 0s !important; */
-  /* border: 1px solid #78a4fa; */
-
-  /* transform: translateY(-10px)  !important; */
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-  /* animation: sparkle 0.5s infinite; */
+/* 定义动画 */
+@keyframes hoverEffect {
+  0% {
+    transform: translateY(-2.5px) scale(1); /* 开始状态 */
+  }
+  30% {
+    transform: translateY(-2.5px) scale(0.96); /* 缩小 */
+  }
+  100% {
+    transform: translateY(-2.5px) scale(1); /* 放大 */
+  }
 }
 
+.accountPmc_Card_P:hover {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  animation: hoverEffect 0.95s ease-in-out forwards; /* 只在鼠标悬停时播放动画 */
+
+}
+
+.accountPmc_Card_PX {
+  width: 230px;
+  height: 220px;
+  background-color: #fafafc;
+  border: 1px solid #fafafc;
+  border-radius: 5px;
+  margin: 4px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  flex: 1 1 auto;
+  padding: 10px;
+  text-align: center;
+  transition: transform 0.3s,
+  box-shadow 0.3s !important;
+}
+
+.accountPmc_Card_PX:hover {
+  box-shadow: 0 0 10px rgba(66, 64, 64, 0.3);
+  animation: hoverEffect 0.95s ease-in-out forwards; /* 只在鼠标悬停时播放动画 */
+
+}
 .accountPmc_Card_P_d {
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
@@ -262,6 +290,15 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], index: numbe
 .accountPmc_Card {
   margin-top: 3px;
   flex: 1 1 auto;
+}
+
+.div2_LayoutX {
+  flex: 1 0 100%;
+  padding: 5px;
+  background-color: #FFFF;
+  border-top-left-radius: 5px;
+  color: #1c1c1c;
+  height: 100%;
 }
 
 .div2_Layout {

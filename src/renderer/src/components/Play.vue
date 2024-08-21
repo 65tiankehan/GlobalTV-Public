@@ -49,6 +49,9 @@ const isSmartRouteEnabled = computed(() => store.getters.getIsSmartRouteEnabled)
 // 使用computed属性来访问getter
 const smartRoutePaths = computed(() => store.getters.getSmartRoutePaths)
 
+// 使用computed属性来访问getter
+const skin = computed(() => store.getters.getSkin)
+
 const props = defineProps({
   myPropTitle: String,
   streamingSource: { type: Array as () => StreamingSources[], default: () => [] }
@@ -523,12 +526,19 @@ const preparelocalPlayUrl = () => {
 
   <div class="right_layout">
     <div
-      style="
-        width: 100%;
-        height: 100%;
-        background-color: #25252b;
-        border-radius: 10px;
-        padding: 5px;
+      :style="
+        skin =='lightTheme'
+         ?
+         ' width: 100%;\n'+
+'        height: 100%;\n'+
+'        background-color: #f4f5f5;\n'+
+'        border-radius: 10px;\n'+
+'        padding: 5px;'
+         :' width: 100%;\n'+
+'        height: 100%;\n'+
+'        background-color: #25252b;\n'+
+'        border-radius: 10px;\n'+
+'        padding: 5px;'
       "
     >
       <n-h3 style="text-align: center">
@@ -580,10 +590,12 @@ const preparelocalPlayUrl = () => {
   .right_layout {
     display: none;
   }
+
   .center_layout {
     width: 100% !important;
   }
 }
+
 .NeworldscroE {
 
   width: 100%;
@@ -715,7 +727,5 @@ const preparelocalPlayUrl = () => {
   border-radius: 10px;
 }
 
-.n-tabs {
-  background-color: rgb(39, 39, 39)
-}
+
 </style>

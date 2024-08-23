@@ -28,7 +28,7 @@ interface smartRoutePath {
 
 }
 
-const isToggLed = ref('0-0')
+
 const store = useStore()
 const message = useMessage()
 // 使用computed属性来访问getter
@@ -52,7 +52,12 @@ const smartRoutePaths = computed(() => store.getters.getSmartRoutePaths)
 // 使用computed属性来访问getter
 const skin = computed(() => store.getters.getSkin)
 
+// 使用computed属性来访问getter
+const isToggLed = computed(() => store.getters.getIsToggLed)
+
 const props = defineProps({
+
+  myPropImg: String,
   myPropTitle: String,
   streamingSource: { type: Array as () => StreamingSources[], default: () => [] }
 })
@@ -66,6 +71,11 @@ clearStreamingSource()
 // 使用store.commit来调用mutation
 const setStreamSource = (StreamSource: string) => {
   store.commit('SET_STREAMSOURCE', StreamSource)
+}
+
+
+const setisToggLed = (isToggLed: string) => {
+  store.commit('SET_TOGGLED', isToggLed)
 }
 
 const loadSource = ref('')
@@ -550,11 +560,12 @@ const preparelocalPlayUrl = () => {
                     :tab="item.name" style="height: 99%;">
           <div class="NeworldscroE">
             <n-space style="flex-grow: 1;" justify="end">
-              <n-button @click="setMediaSource(item2.url);isToggLed=index+'-'+index2" strong secondary
-                        v-for="(item2, index2) in item.EpisodeCollection"
-                        :key="index2" :type="isToggLed == index+'-'+index2 ? 'primary' : 'default'">
-                {{ item2.title }}
-              </n-button>
+
+                <n-button v-for="(item2, index2) in item.EpisodeCollection" :key="index2" @click="setMediaSource(item2.url);setisToggLed(index+'-'+index2)" strong secondary
+                          :type="isToggLed == index+'-'+index2 ? 'primary' : 'default'">
+                  {{ item2.title }}
+                </n-button>
+
             </n-space>
           </div>
         </n-tab-pane>
@@ -563,11 +574,14 @@ const preparelocalPlayUrl = () => {
                     :tab="item.name" style="height: 99%;">
           <div class="NeworldscroE">
             <n-space style="flex-grow: 1;" justify="end">
-              <n-button @click="setMediaSource(item2.url);isToggLed=index+'-'+index2" strong secondary
-                        v-for="(item2, index2) in item.EpisodeCollection"
-                        :key="index2" :type="isToggLed == index+'-'+index2 ? 'primary' : 'default'">
-                {{ item2.title }}
-              </n-button>
+
+
+                <n-button v-for="(item2, index2) in item.EpisodeCollection" :key="index2" @click="setMediaSource(item2.url);setisToggLed(index+'-'+index2)" strong secondary
+                          :type="isToggLed == index+'-'+index2 ? 'primary' : 'default'">
+                  {{ item2.title }}
+                </n-button>
+
+
             </n-space>
           </div>
         </n-tab-pane>
@@ -586,15 +600,15 @@ const preparelocalPlayUrl = () => {
 </template>
 
 <style scoped>
-@media (max-width: 620px) {
+@media (max-width: 835px) {
   .right_layout {
     display: none;
   }
-
   .center_layout {
     width: 100% !important;
   }
 }
+
 
 .NeworldscroE {
 

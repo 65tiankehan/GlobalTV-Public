@@ -14,7 +14,8 @@ interface smartRoutePath {
 export default createStore({
   state() {
     return {
-      skin:'lightTheme',
+      isToggLed:'0-0',
+      skin:'darkTheme',
       view: 'v1',
       searchUrl: '',
       playAddress1: -1,//这个是一级目录选择值
@@ -45,6 +46,9 @@ export default createStore({
     }
   },
   getters: {
+    getIsToggLed: (state) => {
+      return state.isToggLed
+    },
     getSkin: (state) => {
       return state.skin
     },
@@ -126,6 +130,9 @@ export default createStore({
 
   },
   mutations: {
+    SET_TOGGLED: (state, payload) => {
+      state.isToggLed = payload
+    },
     SET_SKIN: (state, payload) => {
       state.skin = payload
     },

@@ -1,14 +1,23 @@
 <script setup lang="ts">
 
 import { useMessage } from 'naive-ui'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed,onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
+import IndexedDBManager from '../indexedDB.js'
 
+const dbManager = new IndexedDBManager()
 const progress = ref(0)
 const message = useMessage()
 const store = useStore()
 const versionB = ref('')
 const versionDescriptions = computed(() => store.getters.getVersionDescriptions)
+
+// 使用computed属性来访问getter
+const skin = computed(() => store.getters.getSkin)
+
+const setskin = (skin: string) => {
+  store.commit('SET_SKIN', skin)
+}
 
 //睡眠
 function sleep(ms: number): Promise<void> {
@@ -18,6 +27,11 @@ function sleep(ms: number): Promise<void> {
 //封装睡眠
 async function SleepForUpdates(ms: number) {
   await sleep(ms)
+}
+
+const checkSkin = async () => {
+  const skinT = await dbManager.get('skin')
+  setskin(skinT?.inventory || 'darkTheme')
 }
 
 //接受来自主进程更新事件
@@ -43,7 +57,13 @@ window.electron.ipcRenderer.on('download-progress-r', (_event, info) => {
   progress.value = info
 })
 
+
+onBeforeMount(() => {
+  setTimeout(checkSkin, 500)
+})
+
 onMounted(() => {
+
   // window.electron.ipcRenderer.send('openUpdate')
   message.info('开始更新')
   window.electron.ipcRenderer.send('check-for-update')
@@ -59,8 +79,8 @@ window.electron.ipcRenderer.on('version-response-Y', (_event, version) => {
 </script>
 
 <template>
-  <div class="update_Layout">
-    <div class="circle"></div>
+  <div :class="skin == 'lightTheme' ? 'update_Layout_X' : 'update_Layout'">
+    <div :class="skin == 'lightTheme' ? '' : 'circle' "></div>
     <div class="update_Handler">
       <n-space vertical>
         <n-breadcrumb>
@@ -181,6 +201,16 @@ video {
   padding: 20px;
 }
 
+.update_Layout_X {
+  -webkit-app-region: drag;
+  background-color: #222222;
+  height: 100%;
+  background-image: url("../assets/laod8.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .update_Layout {
   -webkit-app-region: drag;
   background-color: #222222;
@@ -190,4 +220,6 @@ video {
   background-position: center;
   background-repeat: no-repeat;
 }
+
+
 </style>

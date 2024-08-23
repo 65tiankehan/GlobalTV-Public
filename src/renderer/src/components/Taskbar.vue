@@ -843,9 +843,7 @@ async function clearFavorite() {
   border-top-right-radius: 10px;
   -webkit-app-region: drag;
   background-color: #ffff;
-  border-top: 1px solid #efeff5;
-  border-left: 1px solid #efeff5;
-  border-right: 1px solid #efeff5;
+
   color: #1c1c1c;
 }
 

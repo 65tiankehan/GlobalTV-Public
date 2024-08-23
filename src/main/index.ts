@@ -49,8 +49,8 @@ function createTray(mainWindow: BrowserWindow): void {
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1495,
-    height: 888,
+    width: 1262,
+    height: 761,
     minWidth: 220,
     minHeight: 356,
     show: false,

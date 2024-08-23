@@ -159,6 +159,10 @@ const setskin = (skin: string) => {
   store.commit('SET_SKIN', skin)
 }
 
+const setisToggLed = (isToggLed: string) => {
+  store.commit('SET_TOGGLED', isToggLed)
+}
+
 //发生了分页行为
 const pagination = (page: number) => {
   setpage(page)//改变vuex中页码
@@ -257,13 +261,14 @@ watch(videoDetailsLoading, (newVal, oldVal) => {
 
 
 //点击集，播放
-const PlayBack = (url: string | undefined) => {
+const PlayBack = (url: string | undefined, isToggLed: string | undefined) => {
   showModel.value = false
   // 获取当前时间的时间戳
   const timestamp = Date.now()
   setStreamSource(url + '${' + `${timestamp}`
   )
 
+  setisToggLed(isToggLed ?? '')
   setPlayStarted(true)
   //填写播放地址
 }
@@ -413,7 +418,8 @@ onUnmounted(() => {
     <!--    播放页面-->
     <div style="width: 100%; height: 100%" v-if="PlayStarted == true">
       <div style="padding-top: 39px; height: 100%; width: 100%">
-        <Play v-if="PlayStarted" :streamingSource="dramaDetails.streamingSources" :my-prop-title="dramaDetails.title" />
+        <Play v-if="PlayStarted" :my-prop-img="dramaDetails.imgUrl" :streamingSource="dramaDetails.streamingSources"
+              :my-prop-title="dramaDetails.title" />
       </div>
     </div>
   </div>
@@ -529,7 +535,7 @@ onUnmounted(() => {
                           :tab="item.name">
                 <div style="width: 100%;height: 250px" class="NeworldscroE">
                   <n-space>
-                    <n-button @click="PlayBack(item2.url)" strong secondary
+                    <n-button @click="PlayBack(item2.url,index+'-'+index2)" strong secondary
                               v-for="(item2,index2) in item.EpisodeCollection "
                               :key="index2">
                       {{ item2.title }}

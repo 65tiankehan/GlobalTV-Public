@@ -450,18 +450,18 @@ const isFavorites = (name: string) => {
       "
     >
       <n-space>
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
       </n-space>
       <div
         :class=" skin =='lightTheme' ? 'homeCardDeepX' :'homeCardDeep'"

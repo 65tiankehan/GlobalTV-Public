@@ -348,7 +348,7 @@ async function clearFavorite() {
         </div>
         <div v-show="!PlayStarted" :class="skin == 'lightTheme' ? 'titleTextX' : 'titleText'">Global TV</div>
         <div v-show="PlayStarted">
-          <n-button dashed circle ghost round style="  -webkit-app-region: no-drag;" size="small"
+          <n-button  strong secondary    style="  -webkit-app-region: no-drag;" size="small"
                     @click="closePlayStarted">
 
             <template #icon>
@@ -670,7 +670,9 @@ async function clearFavorite() {
   .iconTitle {
     display: none;
   }
-
+  .titleTextX {
+    display: none;
+  }
   .titleText {
     display: none;
   }

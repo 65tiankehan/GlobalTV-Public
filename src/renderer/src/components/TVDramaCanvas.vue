@@ -95,6 +95,49 @@ const typeUrlIpX = ref('')
 const LatestMovies = ref([])
 const tuplesX = ref([])
 
+// 解析所有搜索结果页面
+async function AxiosAddJournalismList(searchUrls: string[]) {
+  searchUrls.forEach((searchUrl) => {
+    axios
+      .get(payVideoUrl.value + searchUrl)
+      .then((resp) => {
+        const arrx: tvDrama[] = []
+        const $ = cheerio.load(resp.data)
+        $('ul.ewave-vodlist.clearfix').each(function(_n, m) {
+          $(m).children('li').each(function(_b, j) {
+            const pro = {
+              moviesUrl: $($(j).children('div.ewave-vodlist__box')).children('a').attr('data-original'),
+              moviesImgUrl: $($(j).children('div.ewave-vodlist__box')).children('a').attr('href'),
+              name: $($(j).children('div.ewave-vodlist__box')).children('a').attr('title'),
+              Preview: Math.floor(Math.random() * 100) + 1,
+              like: Math.floor(Math.random() * 100) + 1,
+              comment: Math.floor(Math.random() * 100) + 1,
+              download: false,
+              Progress: 0
+            }
+
+            $($($(j).children('div.ewave-vodlist__box')).children('a')).children('span').each(function(c, d) {
+
+              if ($(d).text() != '' && c == 2) {
+                pro['prompt'] = $(d).text()
+              }
+              if ($(d).text() != '' && c == 1) {
+                pro['prompt2'] = $(d).text()
+              }
+            })
+            arrx.push(pro)
+          })
+        })
+
+        // eslint-disable-next-line vue/no-ref-as-operand
+        const mergedfetchMiscArticlesB = [ ...journalismList.value,...arrx]
+        journalismList.value = mergedfetchMiscArticlesB
+      }).catch((err) => {
+      console.log(err)
+    })
+  })
+
+}
 
 //得到详情地址，去除地址中的${及其后面的字符串，返回剩于字符串
 function extractBeforeDollarBrace(str: string): string {
@@ -152,6 +195,7 @@ watch(playVideoType, (newVal, oldVal) => {
 
         // eslint-disable-next-line vue/no-ref-as-operand
         journalismList.value = arrx
+
         message.success('刷新成功！', { duration: 1500 })
       }).catch((err) => {
       console.log(err)
@@ -204,6 +248,18 @@ watch(playRoute, (newVal, oldVal) => {
             arrx.push(pro)
           })
         })
+
+        const searchUrls: string[] = []
+        $('ul.ewave-page.text-center.clearfix').children('li.hide-mobile').each(function(_n,m) {
+          const searchUrl =  $(m).children('a').attr('href')??'';
+          if(searchUrl.lastIndexOf('.html') != -1) {
+             searchUrls.push(searchUrl)
+          }
+
+        });
+
+        //调用异步去解析剩余的页面
+        AxiosAddJournalismList(searchUrls);
 
         // eslint-disable-next-line vue/no-ref-as-operand
         journalismList.value = arrx
@@ -376,7 +432,7 @@ async function setFavorite(index: number) {
 async function getHistorys() {
   const history = await dbManager.get('history')
 
-    journalismList.value = history?.inventory || []
+  journalismList.value = history?.inventory || []
 
   // 计算页数
   // if (journalismList.value.length > 0) {
@@ -450,18 +506,30 @@ const isFavorites = (name: string) => {
       "
     >
       <n-space>
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280" :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
+        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                    :sharp="false" size="medium" />
       </n-space>
       <div
         :class=" skin =='lightTheme' ? 'homeCardDeepX' :'homeCardDeep'"

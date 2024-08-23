@@ -568,7 +568,8 @@ onUnmounted(() => {
 }
 
 /* 当屏幕宽度至少为 400px 时 */
-@media (max-width: 620px) {
+@media (max-width: 798px) {
+
   .space-card {
     width: 200px !important;
 

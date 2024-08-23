@@ -20,7 +20,7 @@ const intervalId = setInterval(() => {
     isDisplay.value = true
     clearInterval(intervalId)
 
-    router.push({ path: '/Update' }) // 修改这里
+    router.push({ path: '/load' }) // 修改这里
   }
 }, 100) // 每1000毫秒执行一次
 </script>

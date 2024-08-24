@@ -42,6 +42,10 @@ interface tvDrama {
   favorites?: boolean
 }
 
+defineProps({
+  myPropHeight: String
+})
+
 const store = useStore()
 
 
@@ -130,7 +134,7 @@ async function AxiosAddJournalismList(searchUrls: string[]) {
         })
 
         // eslint-disable-next-line vue/no-ref-as-operand
-        const mergedfetchMiscArticlesB = [ ...journalismList.value,...arrx]
+        const mergedfetchMiscArticlesB = [...journalismList.value, ...arrx]
         journalismList.value = mergedfetchMiscArticlesB
       }).catch((err) => {
       console.log(err)
@@ -250,16 +254,16 @@ watch(playRoute, (newVal, oldVal) => {
         })
 
         const searchUrls: string[] = []
-        $('ul.ewave-page.text-center.clearfix').children('li.hide-mobile').each(function(_n,m) {
-          const searchUrl =  $(m).children('a').attr('href')??'';
-          if(searchUrl.lastIndexOf('.html') != -1) {
-             searchUrls.push(searchUrl)
+        $('ul.ewave-page.text-center.clearfix').children('li.hide-mobile').each(function(_n, m) {
+          const searchUrl = $(m).children('a').attr('href') ?? ''
+          if (searchUrl.lastIndexOf('.html') != -1) {
+            searchUrls.push(searchUrl)
           }
 
-        });
+        })
 
         //调用异步去解析剩余的页面
-        AxiosAddJournalismList(searchUrls);
+        AxiosAddJournalismList(searchUrls)
 
         // eslint-disable-next-line vue/no-ref-as-operand
         journalismList.value = arrx
@@ -492,45 +496,45 @@ const isFavorites = (name: string) => {
 
 <template>
   <div class="tvDramaCanvas">
+
     <div
       ref="NeworldscroE"
       class="NeworldscroE"
-      style="
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        align-items: center;
-        margin: 0 10px;
-        height: 95%;
+      :style="
+        myPropHeight+' display: flex;\n'+
+'        flex-direction: row;\n'+
+'        flex-wrap: wrap;\n'+
+'        justify-content: flex-start;\n'+
+'        align-items: center;\n'+
+'        margin: 0 10px;'
+
       "
     >
-      <n-space>
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-        <n-skeleton style="  flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
-                    :sharp="false" size="medium" />
-      </n-space>
+
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+                  :sharp="false" size="medium" />
       <div
         :class=" skin =='lightTheme' ? 'homeCardDeepX' :'homeCardDeep'"
         v-for="(item, index) in journalismList"
@@ -912,6 +916,7 @@ const isFavorites = (name: string) => {
 .homeCardDeep {
   width: 209px;
   height: 280px;
+
   background-color: rgb(39, 39, 39);
   border: 1px solid rgb(28, 28, 28);
   border-radius: 5px;

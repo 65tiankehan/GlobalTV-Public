@@ -238,8 +238,8 @@ onUnmounted(() => {
 
 <template>
   <div class="optionList">
-    <div :class="skin == 'lightTheme' ? 'div2_LayoutX' :'div2_Layout' ">
-      <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__backInRight">
+    <div :class="skin == 'lightTheme' ? 'div2_LayoutX ' :'div2_Layout ' ">
+      <div v-if="false" class="accountPmc_Card accountPmc_Card_row animate__animated animate__backInRight">
         <div
           @click="mountedOptionLists(playVideoType,breadcrumbs,page,total,PaginationUrl,-1)"
           :class=" -1 == OptionListSubSelected
@@ -272,7 +272,7 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div v-show="-1 != playAddress2" class="NeworldscroE" style="width: 100%; height: 94%">
+      <div class="NeworldscroE" style="width: 100%; height: 94%">
 
         <div
           v-for="(item, index) in sitesPro"
@@ -365,6 +365,7 @@ onUnmounted(() => {
         </n-space>
 
       </div>
+
     </div>
   </div>
 </template>
@@ -378,15 +379,16 @@ onUnmounted(() => {
 }
 
 .NeworldscroE {
+  /* 移除高度设置，如果需要固定宽度则添加 width 属性 */
   /* height: 430px; */
-  overflow-y: auto;
+  overflow-x: auto;  /* 改为横向滚动 */
+  overflow-y: hidden;  /* 隐藏垂直滚动条 */
 }
 
 .NeworldscroE::-webkit-scrollbar {
   /*滚动条整体样式*/
-  width: 0px;
-  /*高宽分别对应横竖滚动条的尺寸*/
-  height: 0px;
+  width: 0px;  /* 横向滚动条的宽度 */
+  height: 0px;  /* 纵向滚动条的高度，这里不需要设置 */
 }
 
 .NeworldscroE::-webkit-scrollbar-thumb {

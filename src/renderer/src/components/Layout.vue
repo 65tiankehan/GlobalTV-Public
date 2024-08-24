@@ -88,6 +88,7 @@ const router = useRouter()
 const paginationState = ref(false)
 
 const breadcrumbState = ref(false)
+const TVDramaCanvasHeight = ref('height: 70%;')
 
 // 使用computed属性来访问getter
 const breadcrumbs = computed(() => store.getters.getBreadcrumbs)
@@ -341,8 +342,10 @@ watch(breadcrumbs, (newVal, oldVal) => {
 
   if (newVal.length == 1 && newVal[0] === '首页') {
     breadcrumbState.value = false
+    TVDramaCanvasHeight.value = 'height:70%;'
   } else {
     breadcrumbState.value = true
+    TVDramaCanvasHeight.value = 'height:95%;'
   }
 
 })
@@ -393,6 +396,7 @@ onUnmounted(() => {
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
+            padding: 0 10px;
           "
         >
           <n-breadcrumb>
@@ -412,7 +416,27 @@ onUnmounted(() => {
           </n-pagination>
 
         </div>
-        <TVDramaCanvas />
+        <div v-if="!breadcrumbState" style="  width: 100%;padding: 0 10px;">
+          <n-carousel show-arrow>
+            <img
+              class="carousel-img"
+              src="https://pic0.iqiyipic.com/lequ/common/lego/20240727/7e16ef3a2cce4812a210ab286098c8f1.jpg"
+            >
+            <img
+              class="carousel-img"
+              src="https://pic1.iqiyipic.com/lequ/common/lego/20240821/e77b597a75164ed6adff39ebab7edc32.jpg"
+            >
+            <img
+              class="carousel-img"
+              src="https://pic3.iqiyipic.com/lequ/common/lego/20240806/d7d277b86e184b5b9ff30feda4ca2b4a.jpg"
+            >
+            <img
+              class="carousel-img"
+              src="https://pic0.iqiyipic.com/lequ/common/lego/20240823/de3f06cba1fb42d5849e17f10a4e3e34.jpg"
+            >
+          </n-carousel>
+        </div>
+        <TVDramaCanvas :my-prop-height="TVDramaCanvasHeight" />
       </div>
     </div>
     <!--    播放页面-->
@@ -558,6 +582,13 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.carousel-img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
 .layout_lightTheme {
   background-color: #ffff;
 

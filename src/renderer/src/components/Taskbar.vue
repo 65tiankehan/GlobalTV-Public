@@ -715,7 +715,7 @@ async function clearFavorite() {
   /* padding-top: 6px; */
   text-align: center;
   -webkit-app-region: no-drag;
-  margin-top: 4px;
+  margin-top: 2px;
   border-radius: 5px;
 }
 
@@ -738,7 +738,7 @@ async function clearFavorite() {
   /* padding-top: 6px; */
   text-align: center;
   -webkit-app-region: no-drag;
-  margin-top: 4px;
+  margin-top: 2px;
   border-radius: 5px;
 }
 
@@ -757,7 +757,7 @@ async function clearFavorite() {
   border-top-right-radius: 5px;
   text-align: center;
   -webkit-app-region: no-drag;
-  margin-top: 4px;
+  margin-top: 3px;
   border-radius: 5px;
   border-top-right-radius: 10px;
   margin-right: 5px;
@@ -778,10 +778,10 @@ async function clearFavorite() {
   border-top-right-radius: 5px;
   text-align: center;
   -webkit-app-region: no-drag;
-  margin-top: 4px;
+  margin-top: 2px;
   border-radius: 5px;
   border-top-right-radius: 10px;
-  margin-right: 5px;
+  margin-right: 4px;
 }
 
 .BinarylinkageGan:hover {

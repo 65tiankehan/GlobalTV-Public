@@ -28,7 +28,7 @@ import { WarMovieTv } from '../WarMovieTv'//战争片
 import { DocumentaryTv } from '../DocumentaryTv'//纪录片
 import { UHD4KMovieTv } from '../UHD4KMovieTv'//4K电影
 import { useStore } from 'vuex'
-import { computed, watch, ref, onBeforeMount, onUnmounted } from 'vue'
+import { computed, ref, onBeforeMount, onUnmounted } from 'vue'
 
 import axios from 'axios'
 import * as cheerio from 'cheerio'
@@ -145,9 +145,7 @@ const scrapeArticles = () => {
 
 scrapeArticles()
 
-
-watch(playAddress2, (newVal, oldVal) => {
-  console.log('playAddress2 changed from', oldVal, 'to', newVal)
+const watchPlayAddress2 = () => {
   OptionListSubSelected.value = -1
   combinedLists.forEach((array, index) => {
 
@@ -156,7 +154,7 @@ watch(playAddress2, (newVal, oldVal) => {
 
 
     // 检查Map中是否已经有这个key的数组
-    let group = groupedByKey.get(String(newVal))
+    let group = groupedByKey.get(String(playAddress2.value))
 
     // 如果没有，创建一个新的数组
     if (!group) {
@@ -176,9 +174,41 @@ watch(playAddress2, (newVal, oldVal) => {
   if (sitesPro.length <= 0 || -1 == playAddress2.value) {
     scrapeArticles()
   }
+}
 
-})
-
+// watch(playAddress2, (newVal, oldVal) => {
+//   console.log('playAddress2 changed from', oldVal, 'to', newVal)
+//   OptionListSubSelected.value = -1
+//   combinedLists.forEach((array, index) => {
+//
+//     // 只检查数组的第一个元素的key
+//     const firstKey = array[0].key
+//
+//
+//     // 检查Map中是否已经有这个key的数组
+//     let group = groupedByKey.get(String(newVal))
+//
+//     // 如果没有，创建一个新的数组
+//     if (!group) {
+//       group = array
+//       groupedByKey.set(firstKey, group)
+//     } else {
+//       // 如果有，说明有重复的key，可以根据需要处理
+//       console.warn(`${index} Duplicate key found: ${firstKey}`)
+//     }
+//
+//   })
+//
+//   sitesPro = groupedByKey.get(String(playAddress2.value)) || []
+//
+//
+//   //进入文章列表，抓取最新文章
+//   if (sitesPro.length <= 0 || -1 == playAddress2.value) {
+//     scrapeArticles()
+//   }
+//
+// })
+//
 
 //改变选项卡目录
 const mountedOptionLists = (value: string, setbreadcrumb: string[], page: number, total: number, PaginationUrl: string, index: number) => {
@@ -226,6 +256,8 @@ const hasOfficialAds = async () => {
 }
 onBeforeMount(() => {
   intervalId = setInterval(hasOfficialAds, 120000) // 每2分钟检查一次
+  console.log('想法：每次点击都重新before' +playAddress2.value)
+  watchPlayAddress2()
 })
 
 onUnmounted(() => {
@@ -272,7 +304,7 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div class="NeworldscroE" style="width: 100%; height: 94%">
+      <div v-show="-1 != playAddress2" class="" style="width: 100%; height: 94%">
 
         <div
           v-for="(item, index) in sitesPro"
@@ -329,7 +361,7 @@ onUnmounted(() => {
           </n-card>
         </n-space>
       </div>
-      <div v-show="-1 == playAddress2" class="NeworldscroE" style="width: 100%; height: 100%">
+      <div v-show="-1 == playAddress2" class="" style="width: 100%; height: 100%">
         <n-space vertical>
           <n-card v-for="(item, index) in fetchMiscArticlesB" :key="index" :title="item.title" embedded
                   :bordered="false">
@@ -379,16 +411,15 @@ onUnmounted(() => {
 }
 
 .NeworldscroE {
-  /* 移除高度设置，如果需要固定宽度则添加 width 属性 */
   /* height: 430px; */
-  overflow-x: auto;  /* 改为横向滚动 */
-  overflow-y: hidden;  /* 隐藏垂直滚动条 */
+  overflow-y: auto;
 }
 
 .NeworldscroE::-webkit-scrollbar {
   /*滚动条整体样式*/
-  width: 0px;  /* 横向滚动条的宽度 */
-  height: 0px;  /* 纵向滚动条的高度，这里不需要设置 */
+  width: 0px;
+  /*高宽分别对应横竖滚动条的尺寸*/
+  height: 0px;
 }
 
 .NeworldscroE::-webkit-scrollbar-thumb {

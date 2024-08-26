@@ -373,6 +373,10 @@ onUnmounted(() => {
     clearInterval(intervalId2)
   }
 })
+const active = ref(false)
+const showActive = () => {
+  active.value = !active.value
+}
 </script>
 
 <template>
@@ -383,9 +387,22 @@ onUnmounted(() => {
       <div class="left_layout" style="padding-top: 39px">
         <OptionList />
       </div>
-      <div class="right_layout" style="padding-top: 39px">
-        <OptionListSub />
-      </div>
+      <n-drawer style="border-radius: 10px;" v-model:show="active" :width="350" placement="right">
+        <n-drawer-content  :native-scrollbar="false">
+          <OptionListSub />
+          <template #header>
+            <n-space>
+              <svg t="1724637327332" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5972" width="24" height="24"><path d="M186.12224 704.9216s195.70688-346.27584 251.20768-239.32928c0 0 26.86976 131.6864 107.64288-15.11424 0 5.69344 107.7248-250.96192 179.4048-145.08032 0-1.72032 251.24864 455.96672 251.24864 455.96672s-17.94048 93.7984-394.73152 60.29312c-165.4784-25.68192-161.50528-131.8912-394.77248-116.736z" fill="#007EE2" p-id="5973"></path><path d="M63.8976 878.42816l131.19488-102.64576s134.5536-13.43488 206.35648 30.3104c19.37408 11.4688 197.38624 148.02944 574.17728 49.3568-4.5056 0-174.98112 191.0784-610.05824 46.16192-17.6128-4.01408-103.2192-44.2368-301.6704-23.18336z m373.43232-657.77664a94.208 94.208 0 1 1-188.416 0 94.208 94.208 0 0 1 188.416 0z m27.48416-42.3936l73.40032 42.3936-73.40032 42.3936v-84.7872zM401.2032 106.496l82.3296-20.2752-23.59296 81.42848L401.2032 106.496z m58.85952 167.69024l23.47008 81.42848-82.3296-20.39808 58.85952-61.0304zM203.1616 361.92256l23.38816-81.46944L285.4912 341.4016l-82.24768 20.48z m18.18624-183.66464L147.98848 220.65152l73.40032 42.3936v-84.7872zM285.4912 105.30816l-82.61632-18.96448 24.86272 81.01888 57.7536-62.0544z m15.27808-4.42368L343.08096 27.48416l42.3936 73.40032H300.72832z m0 242.4832l42.35264 73.35936 42.3936-73.40032H300.72832z" fill="#007EE2" p-id="5974"></path></svg>
+              新闻/更多分类
+            </n-space>
+
+          </template>
+        </n-drawer-content>
+      </n-drawer>
+
+<!--      <div class="right_layout" style="padding-top: 39px">-->
+<!--        <OptionListSub />-->
+<!--      </div>-->
       <div class="center_layout" style="padding-top: 39px">
         <div
           style="
@@ -399,10 +416,15 @@ onUnmounted(() => {
             padding: 0 10px;
           "
         >
-          <n-breadcrumb>
-            <n-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="index"> {{ item }}</n-breadcrumb-item>
+          <n-space>
+            <n-button size="small"  quaternary @click="showActive">
+              展开更多
+            </n-button>
+            <n-breadcrumb>
+              <n-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="index"> {{ item }}</n-breadcrumb-item>
 
-          </n-breadcrumb>
+            </n-breadcrumb>
+          </n-space>
           <!--  表达排除首页 -->
 
           <n-pagination :page-slot="7" @update:page="pagination"
@@ -416,8 +438,8 @@ onUnmounted(() => {
           </n-pagination>
 
         </div>
-        <div v-if="!breadcrumbState" style="  width: 100%;padding: 0 10px;">
-          <n-carousel show-arrow>
+        <div v-if="!breadcrumbState" style="  width: 100%;padding: 0 16px;">
+          <n-carousel autoplay show-arrow>
             <img
               class="carousel-img"
               src="https://pic0.iqiyipic.com/lequ/common/lego/20240727/7e16ef3a2cce4812a210ab286098c8f1.jpg"
@@ -582,6 +604,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+
 .carousel-img {
   width: 100%;
   height: 240px;
@@ -679,7 +702,7 @@ onUnmounted(() => {
 }
 
 .center_layout {
-  width: 60%;
+  width: 80%;
   height: 100%;
   float: right;
 }

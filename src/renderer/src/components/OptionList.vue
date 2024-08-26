@@ -73,7 +73,7 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], index: numbe
     <div :class="skin == 'lightTheme' ? 'div2_LayoutX' :'div2_Layout' ">
       <div class="accountPmc_Card accountPmc_Card_row animate__animated animate__backInLeft">
         <div @click="mountedOptionLists(payVideoUrl,['首页'],-1,'-1',1,0,'')" :class=" -1 == playAddress1
-             ? skin == 'lightTheme' ? 'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_dX' :'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
+             ? skin == 'lightTheme' ? 'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d_X' :'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
             : skin == 'lightTheme' ? 'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height ' : 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height '
             "
              style="justify-content: flex-start">
@@ -162,7 +162,7 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], index: numbe
           <div
             @click="mountedOptionLists(item.url,item.breadcrumb,index,item.key,item.Pagination.page,item.Pagination.total,item.PaginationUrl)"
             :class="index == playAddress1
-             ? skin == 'lightTheme' ? 'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_dX' :'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
+             ? skin == 'lightTheme' ? 'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d_X' :'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height accountPmc_Card_P_d'
             : skin == 'lightTheme' ? 'accountPmc_Card_PX accountPmc_Card_P_Hideout setup_button_height ' : 'accountPmc_Card_P accountPmc_Card_P_Hideout setup_button_height '
             " style="justify-content: flex-start">
             <div style="display: flex; align-items: flex-start; justify-content: space-between">
@@ -269,6 +269,9 @@ const mountedOptionLists = (value: string, setbreadcrumb: string[], index: numbe
 }
 .accountPmc_Card_P_d {
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+.accountPmc_Card_P_d_X {
+  box-shadow: 0 0 10px rgba(154, 154, 154, 0.3);
 }
 
 .setup_button_height {

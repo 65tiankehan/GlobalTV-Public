@@ -348,7 +348,8 @@ async function setProtocol18DB(value: boolean) {
     window.electron.ipcRenderer.send('closeWin')
   }
   history.protocol18 = value
-  setProtocol18(value)
+
+  setProtocol18(false)
   // 更新`Protocol18`对象
   await dbManager.update(history.id, history)
 

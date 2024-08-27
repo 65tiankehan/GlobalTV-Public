@@ -14,6 +14,7 @@ interface smartRoutePath {
 export default createStore({
   state() {
     return {
+      protocol18:false,
       isToggLed:'0-0',
       skin:'darkTheme',
       view: 'v1',
@@ -46,6 +47,9 @@ export default createStore({
     }
   },
   getters: {
+    getProtocol18: (state) => {
+      return state.protocol18
+    },
     getIsToggLed: (state) => {
       return state.isToggLed
     },
@@ -130,6 +134,9 @@ export default createStore({
 
   },
   mutations: {
+    SET_PROTOCOL18: (state, payload) => {
+      state.protocol18 = payload
+    },
     SET_TOGGLED: (state, payload) => {
       state.isToggLed = payload
     },

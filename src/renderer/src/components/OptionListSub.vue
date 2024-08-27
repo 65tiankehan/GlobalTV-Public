@@ -537,7 +537,7 @@ onUnmounted(() => {
 .div2_Layout {
   flex: 1 0 100%;
   padding: 5px;
-  background-color: #1c1c1c;
+  background-color: #2c2c32;
   border-top-left-radius: 5px;
   color: #eaeaea;
   /* border: 1px solid rgb(50, 50, 50); */

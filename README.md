@@ -23,23 +23,26 @@
 ### 安装依赖
 
 
-bash $ npm install
+```bash
+$ npm install
+```
 ### 开发模式
 
 启动开发服务器：
-
-bash $ npm run dev
+```bash
+ $ npm run dev
+ ```
 ### 构建
 
 构建不同操作系统的应用包：
-bash
+```bash
 构建 Windows 版本
 $ npm run build:win
 构建 macOS 版本
 $ npm run build:mac
 构建 Linux 版本
 $ npm run build:linux
-
+```
 ## 功能特性
 
 - **跨平台支持**：支持 Windows、macOS 和 Linux。

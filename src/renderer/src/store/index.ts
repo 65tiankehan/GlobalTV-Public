@@ -10,13 +10,15 @@ interface smartRoutePath {
   path?: string//线路，用于替代相关palyer**Url
 
 }
+
 //darkTheme  lightTheme
 export default createStore({
   state() {
     return {
-      protocol18:false,
-      isToggLed:'0-0',
-      skin:'darkTheme',
+      CaseServiceAgreement: false,
+      protocol18: false,
+      isToggLed: '0-0',
+      skin: 'darkTheme',
       view: 'v1',
       searchUrl: '',
       playAddress1: -1,//这个是一级目录选择值
@@ -42,11 +44,14 @@ export default createStore({
         localPath: 'https://ml-tv.cc',
         path: 'https://ml-tv.cc/index.php/vod/search.html?wd='
       }] as smartRoutePath[],//智能路由
-      History:'',//历史记录
-      Favorite:''//收藏
+      History: '',//历史记录
+      Favorite: ''//收藏
     }
   },
   getters: {
+    getCaseServiceAgreement: (state) => {
+      return state.CaseServiceAgreement
+    },
     getProtocol18: (state) => {
       return state.protocol18
     },
@@ -134,6 +139,9 @@ export default createStore({
 
   },
   mutations: {
+    SET_CASE_SERVICE_AGREEMENT: (state, payload) => {
+      state.CaseServiceAgreement = payload
+    },
     SET_PROTOCOL18: (state, payload) => {
       state.protocol18 = payload
     },

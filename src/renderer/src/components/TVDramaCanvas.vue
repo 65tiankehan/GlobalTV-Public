@@ -499,7 +499,7 @@ const isFavorites = (name: string) => {
 
     <div
       ref="NeworldscroE"
-      class="NeworldscroE"
+      class="NeworldscroE tvDr"
       :style="
         myPropHeight+' display: flex;\n'+
 '        flex-direction: row;\n'+
@@ -719,6 +719,14 @@ const isFavorites = (name: string) => {
 </template>
 
 <style scoped>
+@media (max-height: 716px) {
+  .tvDr {
+    height: 95% !important;
+  }
+}
+.tvDr {
+
+}
 .n-tag {
   border-radius: 5px !important;
 }

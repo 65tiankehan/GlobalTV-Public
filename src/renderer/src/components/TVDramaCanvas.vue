@@ -511,29 +511,41 @@ const isFavorites = (name: string) => {
       "
     >
 
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
-      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;" v-if="journalismList.length <= 0" :width="209" :height="280"
+      <n-skeleton style=" margin: 5px;margin-bottom: 10px; cursor: pointer; padding: 10px; flex: 1 1 auto;"
+                  v-if="journalismList.length <= 0" :width="209" :height="280"
                   :sharp="false" size="medium" />
       <div
         :class=" skin =='lightTheme' ? 'homeCardDeepX' :'homeCardDeep'"
@@ -617,64 +629,77 @@ const isFavorites = (name: string) => {
                         text-overflow: ellipsis;">{{ item.name }}
               </div>
             </div>
-            <div class="homeTitleCarTextNexKup">
-              <span>
-                {{ item.NexT }}
-              </span>
-            </div>
+
             <div class="homeTitleCarTextNexUnp">
               <div class="homeTitleCarTextNexUnpCard">
-                <div
-                  :class="skin == 'lightTheme' ? 'homeTitleCardTextNexUnpCardImgGuidX' :'homeTitleCardTextNexUnpCardImgGuid' ">
-                  <img
-                    class="homeTitleCardTextNexUnpCardImgGuidBum"
-                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABEVJREFUWAntVn1oW1UUP+e+pEu3VWETmTpY2fxnCDr9Q1AE7T8KEVeWZMHlC6ttk8EcKgwUtK5TUfGLodimqyhtU2ZIIt1QUWRTFEEsc4jDCY51Q3QIDrau9sPcez0n3Q15r++9tv5rLyT3nvP7nY933rknAVhZ//cK4HIK8N7YWMvcpWoUQT8EqDeDxlbayQdOgIYzGvBoi2iupFLhy0v1u6QE3i9+vGF2ZvqARp2iQM2+zhGmKaeRVaHmno74gxd8uQT6JqC1FvmR0j4N8CwFXruYMxuOcIWcv5hNxV5DRGXDGgTPBK4+9agG3dbAX/YRAY9TNRJe1XBNYKDw0TYpq59StA1eEckxvXP4lXFycjMlusWLS/oLwSCGO3fFfnByFiQwMFq5V0p5hEp+jZPMMj+RCMDj3YnYqUZ8YLR0i6rC254VQ7hsWdb27kTkq0Y7WwL50co9SsrP3RoNESSgeDKbjLxD75QefuGinsF8obIHtHpLa7AWMKhBhWXdn01EvjFYPQEuu1LVL8nwWgPad3xldyb2DOv6hyu3AcjnKdE75zn4nRWA3q5E7EeW+4ZKLwPop+cx+zc9yCUhAvd1J3ecZETwFzecUvKoV3Aq+6lN163ez9yBocrDoOX3xN1BZbhp/qMjsqrHaxhxalzEn5jvXByDY3FMxkR+fDw4O/N3hcq30Uk2Mg2Y18Ph8OyhkfJGiTJPQYMGMzvrFMp+5jCXhtQbBnPuHItjcmyhfj63n4zvcpIaZRFqOsayUjri1ZyMzz8dcWgZGz67LY6pT5/tFdQwj7oRbLrNN/zBMk0Tevf+q865auPH1go6uAd+8SMxFjp/vnYlqWN/W4xrOMbGj0+9dUIEAriXLve0H3F2Wt/OuIX6Cz9eI8fYePH5NljQtEfw1UEUHV5E1iulHuG9K73zaxT4AZ/dFmPMYczYuPEYBoGJrsz2s7VrmEtFPxQIPR5kbq5kf6EUZnxd09asAHwJEKt1Pp1ZxxjrmMs2ddxxoEG2L5eMfcLq+iBioW+kdBCU3svnBQvh96AQd3cmo+cY4/8GckrewWdrjXXisfb2ST4PFsqb/lHqW7otN7LsXFTtV3PpaH1I2RKojdLh8rs0z3NOQ5apaSYp+6ey6eigG54fLneSjzfJvsUNJ9uDuXTsiUbMloAB+obLB+h6Pmdk504NdJLu8ZglxBnGpFJbyFE7lX2bk2tkfsXZ9M4XjGx21wQYpHmfoST66GlWG/J/2SnZKfpdyu5ORwpu9p4JMPnQ4crW6pw6TDPuVjfjxXRcKbRwVzYRO+3F9U2AjYpFbV2cK3dReXvpOlzv5cimR/yTOqZn/arIYDyO0oY5hEUTMPxi8fjav2YuxuivQIoarY30tStscNppCuMx+hTWh9aV4vG2Kw2Y53HJCTR6GBr6bM1MYLJVS2xlPVp6IlRtmchkHphieWWtVGA5FfgXAfWiKTPtugcAAAAASUVORK5CYII="
-                  />
-                </div>
-                <div class="homeTitleCardTextNexUnpCardText">{{ item.Preview }}万</div>
-              </div>
-              <div class="homeTitleCarTextNexUnpCard">
-                <div
-                  :class="skin == 'lightTheme' ? 'homeTitleCardTextNexUnpCardImgGuidX' :'homeTitleCardTextNexUnpCardImgGuid' ">
-                  <img
-                    class="homeTitleCardTextNexUnpCardImgGuidBum"
-                    src=" data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAldJREFUWAntV01oE0EUft+YtBgrlPbgTbx4sCKCZy/2ZpESRFeQELBF6sWLXjwoInjyJl4ShFZjVAihDRHFHjRXiyeRij2oh3rRUhGNQW2yz7fbZtlsdtmsbh0Q97Az782b733zzZv9IdJ84U/yMzPyxfJ5YjrLhG0AVQaQOpfJjH3pFTfRa6BfXK44e0WSX1ofY2KmyToaW8Q+5Rfv51N+zl58+TvlNIgvemNFlROWMl5/kP1bBHLFyoistuCbiGnrdLU6EJTQ649MYGZubpC4WRHBt3vB2vbE+Pi3dj+sjURAVqy+11v3pN0dBAxCA4AZNO71RyrC/N3yVSm6w16QDhv8tcMOMbqKJV+s7GNujsqxGrbmKuaHU9ljCzcLs6NNaj0JwSNR4DMDN4LiIPIR1JsU0+Ns9uhHR4FarZZ4vbx62zTXTq5PZrthpVaks8DK3EU9CCu1ITXCG0ezm4aNyi1qgD7k7pePODWwtPzpAhFvJO+eGLdHdNhBa3TNISDJJ+NOEooHPuAQEOl2hk6IOUC2Y8UhINjufsyp/OHkuM7/9aRuKgr0QB8BUH0wuaemjwBh3jD2/tRGwJLf2g5dBMxkX+qRPgLAswljzHrC6lFAPmSqVnLr0rMFSNr7r4cA8PZMJv3KXr4OBeR17MjfoYA8Ft+3WW1mC5WcduO7a6DkHtiMvvw3FKYy6ZdubIfAUP/wZQKeuwfj6ou6DIVbQ/0jp72YzheRYRyql0qLB1d/LB0HmfslsM8OBr2wWjZpUYCu275ot3dA4ql35dEg/kf/ywr8Aonws4baE7rQAAAAAElFTkSuQmCC
-   "
-                  />
-                </div>
-                <div class="homeTitleCardTextNexUnpCardText">{{ item.like }}万</div>
-              </div>
-              <div class="homeTitleCarTextNexUnpCard">
-                <div
-                  :class="skin == 'lightTheme' ? 'homeTitleCardTextNexUnpCardImgGuidX' :'homeTitleCardTextNexUnpCardImgGuid' ">
-                  <img
-                    class="homeTitleCardTextNexUnpCardImgGuidBum"
-                    src="  data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAbNJREFUWAljYBjpgBE5AGYvWSvz9///LqCYw////yWR5ShmMzI8Y/jPeICBg70sM8z3Kcw8uAPAlv/7d/E/A4MQTJIWNCMjwxtWFjb95Ej/ZyDzmWCWgHxOa8tBdv3/zyDy+8/vTpi9cAcABRxggnSg4XbBHUD1OMfjC6BdUjBpuANgAvSmRx0w4CHAgivOgQXEcQYmpj5keWDiKQbmIwsGRsZjjIyM/chyQPESoLw5XjkUDRAOTgcApZ9kxASvQdYzY/HqcGBZwQB0HIbc9MVrIoBS5oz/GR5nxKLpW7QmEtkcZPaAR8HgdgAwThlRMDCCYcGHIg5UBxMHxg+qHmQ5uCIEA65x+qLVoOilF/iXGRfKDLJscEcBPYJjNATgIQBM31/pEeTodsAd8J+B8Ry6JD34cAcwMjA108NCdDvgDsiIDdrNzMwUB4yKj+iKaMmHF0QwS1atOsb57s8LA4b/f6nXLP/LYAss5QpgdgBpeEGEURuGhVl9Byo4jqSYGsx10xev/czw/18tumHwKECXoDY/Mza4joERM53RzQEgD+FyBLU9S9C8mYvX1hNUNGIUAACd/5qYm/6utwAAAABJRU5ErkJggg==
-            "
-                  />
-                </div>
 
-                <div class="homeTitleCardTextNexUnpCardText">
-                  {{ item.comment }}
-                </div>
+                <n-tag  :bordered="false" type="warning">
+                  <div :class="skin == 'lightTheme' ? 'homeTitleCardTextNexUnpCardText_X' :'homeTitleCardTextNexUnpCardText'">{{ item.Preview }}万</div>
+                  <template #icon>
+                    <svg t="1724806808953" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="8489" width="24" height="24">
+                      <path
+                        d="M705.197 853.411h-384.39c-13.728 0-24.835-11.119-24.835-24.835 0-13.715 11.107-24.837 24.835-24.837h384.391c13.728 0 24.835 11.122 24.835 24.837-0.001 13.716-11.108 24.835-24.836 24.835z"
+                        fill="#213847" p-id="8490"></path>
+                      <path
+                        d="M513.014 832.904c-13.727 0-24.835-11.119-24.835-24.834v-66.43c0-13.714 11.108-24.836 24.835-24.836 13.728 0 24.836 11.122 24.836 24.836v66.431c0 13.714-11.109 24.833-24.836 24.833z"
+                        fill="#213847" p-id="8491"></path>
+                      <path
+                        d="M382.191 228.998h-63.737c-54.861 0-99.341 44.481-99.341 99.342v314.601c0 54.861 44.48 99.343 99.341 99.343H774.61c54.859 0 99.341-44.481 99.341-99.343V328.34c0-54.861-44.481-99.342-99.341-99.342H612.55l-228.272-0.193"
+                        fill="#FC607B" p-id="8492"></path>
+                      <path
+                        d="M157.024 485.222c-13.727 0-24.835-11.12-24.835-24.835v-65.193c0-13.715 11.108-24.836 24.835-24.836 13.728 0 24.835 11.121 24.835 24.836v65.193c0 13.715-11.108 24.835-24.835 24.835z"
+                        fill="#213847" p-id="8493"></path>
+                      <path
+                        d="M769.638 201.702l-447.424-0.231h-0.024c-1.103 0-2.186 0.08-3.25 0.219h-62.573c-68.467 0-124.177 55.71-124.177 124.177 0 13.715 11.108 24.835 24.835 24.835 13.728 0 24.835-11.12 24.835-24.835 0-41.086 33.421-74.506 74.506-74.506h63.738c1.102 0 2.185-0.079 3.249-0.218l446.285 0.23c41.085 0 74.507 33.421 74.507 74.506v314.552c0 41.085-33.422 74.507-74.507 74.507H256.366c-41.085 0-74.506-33.422-74.506-74.507V537.985c0-13.715-11.108-24.836-24.835-24.836s-24.835 11.121-24.835 24.836V640.43c0 68.468 55.71 124.178 124.177 124.178h513.272c68.468 0 124.177-55.71 124.177-124.178V325.878c-0.002-68.467-55.711-124.176-124.178-124.176z"
+                        fill="#213847" p-id="8494"></path>
+                      <path
+                        d="M438.75 598.691a24.75 24.75 0 0 1-11.981-3.081 24.835 24.835 0 0 1-12.854-21.755V386.099a24.839 24.839 0 0 1 12.854-21.755c7.907-4.366 17.56-4.087 25.248 0.764l148.526 93.885a24.832 24.832 0 0 1 11.569 20.991 24.816 24.816 0 0 1-11.569 20.991l-148.526 93.873a24.835 24.835 0 0 1-13.267 3.843z m24.835-167.517v97.607l77.199-48.798-77.199-48.809z"
+                        fill="#213847" p-id="8495"></path>
+                    </svg>
+                  </template>
+                </n-tag>
+              </div>
+              <div class="homeTitleCarTextNexUnpCard">
+
+
+                <n-tag  :bordered="false" type="success">
+                  <div :class="skin == 'lightTheme' ? 'homeTitleCardTextNexUnpCardText_X' :'homeTitleCardTextNexUnpCardText'">{{ item.like }}万</div>
+                  <template #icon>
+                    <svg t="1724806961601" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="10401" width="15" height="15">
+                      <path
+                        d="M891.054194 141.084444c-72.817778-11.377778-147.911111 9.102222-200.248889 59.164445 0 0-40.96-152.462222-161.564445-200.248889-91.022222 31.857778-159.288889 106.951111-182.044444 200.248889 0 0-38.684444-79.644444-200.248889-59.164445 0 0-200.248889 532.48 341.333333 639.431112V1024h40.96V780.515556c97.848889-13.653333 521.102222-102.4 361.813334-639.431112z"
+                        fill="#02DDBF" p-id="10402"></path>
+                      <path
+                        d="M954.769749 780.515556c-227.555556-15.928889-391.395556 141.084444-400.497777 147.911111-9.102222 9.102222-9.102222 22.755556 0 31.857777 4.551111 4.551111 11.377778 6.826667 15.928888 6.826667 6.826667 0 11.377778-2.275556 15.928889-6.826667 2.275556-2.275556 157.013333-147.911111 364.088889-134.257777 11.377778 0 22.755556-9.102222 25.031111-20.48s-6.826667-25.031111-20.48-25.031111zM67.303083 800.995556c-13.653333 0-22.755556 11.377778-20.48 25.031111 0 13.653333 11.377778 22.755556 25.031111 20.48 207.075556-15.928889 361.813333 141.084444 364.088889 141.084444 4.551111 4.551111 11.377778 6.826667 15.928889 6.826667 6.826667 0 11.377778-2.275556 15.928888-6.826667 9.102222-9.102222 9.102222-22.755556 0-31.857778-6.826667-4.551111-172.942222-170.666667-400.497777-154.737777z"
+                        fill="#02DDBF" p-id="10403"></path>
+                    </svg>
+                  </template>
+                </n-tag>
+              </div>
+              <div class="homeTitleCarTextNexUnpCard">
+
+                <n-tag  :bordered="false" type="info">
+                  <div :class="skin == 'lightTheme' ? 'homeTitleCardTextNexUnpCardText_X' :'homeTitleCardTextNexUnpCardText'">{{ item.comment }}</div>
+                  <template #icon>
+                    <svg t="1724807253717" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="11678" width="22" height="22">
+                      <path
+                        d="M520.533333 866.133333c-17.066667 0-29.866667-4.266667-38.4-17.066666l-38.4-38.4H166.4c-38.4 0-68.266667-29.866667-68.266667-68.266667V243.2c0-38.4 29.866667-68.266667 68.266667-68.266667h712.533333c38.4 0 68.266667 29.866667 68.266667 68.266667v494.933333c0 38.4-29.866667 68.266667-68.266667 68.266667h-277.333333l-38.4 38.4c-12.8 17.066667-25.6 21.333333-42.666667 21.333333zM166.4 234.666667c-4.266667 0-12.8 4.266667-12.8 12.8v494.933333c0 4.266667 4.266667 12.8 12.8 12.8H469.333333l55.466667 55.466667 51.2-55.466667h302.933333c4.266667 0 12.8-4.266667 12.8-12.8V243.2c0-4.266667-4.266667-12.8-12.8-12.8H166.4z"
+                        fill="#6A3906" p-id="11679"></path>
+                      <path
+                        d="M797.866667 682.666667h-554.666667c-21.333333 0-34.133333-17.066667-34.133333-34.133334V337.066667c0-21.333333 17.066667-38.4 34.133333-38.4h554.666667c21.333333 0 34.133333 17.066667 34.133333 34.133333v311.466667c4.266667 21.333333-12.8 38.4-34.133333 38.4z"
+                        fill="#F5CB2B" p-id="11680"></path>
+                      <path
+                        d="M708.266667 443.733333H337.066667c-17.066667 0-29.866667-12.8-29.866667-29.866666 0-17.066667 12.8-29.866667 29.866667-29.866667h371.2c17.066667 0 29.866667 12.8 29.866666 29.866667 0 17.066667-12.8 29.866667-29.866666 29.866666zM512 622.933333H337.066667c-17.066667 0-29.866667-12.8-29.866667-29.866666 0-17.066667 12.8-29.866667 29.866667-29.866667H512c17.066667 0 29.866667 12.8 29.866667 29.866667 0 17.066667-12.8 29.866667-29.866667 29.866666z"
+                        fill="#6A3906" p-id="11681"></path>
+                    </svg>
+                  </template>
+                </n-tag>
               </div>
             </div>
-            <div
-              class="homeTitleCarTextNexUnp"
-              style="
-                overflow: hidden;
-                text-overflow: ellipsis;
-                display: -webkit-box;
-                -webkit-line-clamp: 1; /* 显示的行数 */
-                -webkit-box-orient: vertical;
-                white-space: normal;
-                color: rgb(148, 142, 142);
-                font-size: 10px;
-                padding: 1px;
-              "
-            >
-              {{ item.moviesTab }}
-            </div>
+
           </div>
         </div>
         <div v-show="item.download">
@@ -694,6 +719,9 @@ const isFavorites = (name: string) => {
 </template>
 
 <style scoped>
+.n-tag {
+  border-radius: 5px !important;
+}
 .NeworldscroE {
   /* height: 430px; */
   overflow-y: auto;
@@ -766,8 +794,12 @@ const isFavorites = (name: string) => {
 .homeTitleCardTextNexUnpCardText {
   float: left;
   font-size: 10px;
-  padding-top: 3px;
   color: rgb(221, 214, 214);
+}
+.homeTitleCardTextNexUnpCardText_X {
+  float: left;
+  font-size: 10px;
+  color: rgb(43 40 40);
 }
 
 .homeTitleCardTextNexUnpCardImgGuid {
@@ -792,14 +824,16 @@ const isFavorites = (name: string) => {
 
 .homeTitleCarTextNexUnpCard {
   height: 100%;
-  width: 33%;
-  float: left;
-  padding-left: 5px;
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
 }
 
 .homeTitleCarTextNexUnp {
   width: 100%;
   height: 30%;
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .homeTitleCarTextNexKup {
@@ -820,6 +854,7 @@ const isFavorites = (name: string) => {
   font-size: 14px;
   width: 100%;
   padding: 5px;
+  padding-left: 10px;
 }
 
 .homeTitleCarTextNexTupX {
@@ -827,6 +862,7 @@ const isFavorites = (name: string) => {
   width: 100%;
   padding: 5px;
   color: #1c1c1c;
+  padding-left: 10px;
 }
 
 .homeTitleCarTextNex {

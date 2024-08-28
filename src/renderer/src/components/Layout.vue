@@ -385,8 +385,13 @@ const checkSkin = async () => {
 
 //当应用启动后，2秒后，检查用户是否同意过使用协议，如果没同意，则弹出协议，反之不弹窗协议
 const checkprotocol18 = async () => {
-  const protocol18 = await dbManager.get('protocol18')
-  setProtocol18(!protocol18?.protocol18 || true)
+    const protocol18 = await dbManager.get('protocol18');
+    console.log('protocol18');
+    console.log(protocol18);
+
+    // 设置相反的布尔值
+    setProtocol18(!protocol18?.protocol18);
+
 }
 onBeforeMount(() => {
   intervalId = setInterval(checkForUpdates, 60000) // 每分钟检查一次
@@ -487,19 +492,31 @@ const showActive = () => {
           <n-carousel autoplay show-arrow>
             <img
               class="carousel-img"
-              src="https://pic0.iqiyipic.com/lequ/common/lego/20240727/7e16ef3a2cce4812a210ab286098c8f1.jpg"
+              src="https://pic3.iqiyipic.com/lequ/common/lego/20240827/aeb78ec544c94803bd8e14d7bd682633.jpg"
             >
             <img
               class="carousel-img"
-              src="https://pic1.iqiyipic.com/lequ/common/lego/20240821/e77b597a75164ed6adff39ebab7edc32.jpg"
+              src="https://pic3.iqiyipic.com/lequ/common/lego/20240826/80687ab5dca14a039d23ee3d5c20f19d.jpg"
             >
             <img
               class="carousel-img"
-              src="https://pic3.iqiyipic.com/lequ/common/lego/20240806/d7d277b86e184b5b9ff30feda4ca2b4a.jpg"
+              src="https://pic3.iqiyipic.com/lequ/common/lego/20240823/a6ba9aa583eb4ec0ad893a5775ec451d.jpg"
             >
             <img
               class="carousel-img"
-              src="https://pic0.iqiyipic.com/lequ/common/lego/20240823/de3f06cba1fb42d5849e17f10a4e3e34.jpg"
+              src="https://pic1.iqiyipic.com/lequ/common/lego/20240818/4cd7fb7ee85e4ca083493823bf4b7506.jpg"
+            >
+            <img
+              class="carousel-img"
+              src="https://pic0.iqiyipic.com/lequ/common/lego/20240819/b397b52791a94947bc9b590df741e36d.jpg"
+            >
+            <img
+              class="carousel-img"
+              src="https://pic3.iqiyipic.com/lequ/common/lego/20240816/9f6f06df974341abb10d6fba14ebc62f.jpg"
+            >
+            <img
+              class="carousel-img"
+              src="https://pic3.iqiyipic.com/lequ/common/lego/20240822/5851577964ff48b7b0c5d55bf5375e02.jpg"
             >
           </n-carousel>
         </div>

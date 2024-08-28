@@ -889,8 +889,7 @@ const isFavorites = (name: string) => {
 
 .homeTitleCarText {
   padding-top: 5%;
-  padding-left: 3%;
-  padding-right: 3%;
+
   padding-bottom: 3%;
   width: 100%;
   height: 40%;

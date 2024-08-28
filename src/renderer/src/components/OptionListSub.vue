@@ -176,39 +176,6 @@ const watchPlayAddress2 = () => {
   }
 }
 
-// watch(playAddress2, (newVal, oldVal) => {
-//   console.log('playAddress2 changed from', oldVal, 'to', newVal)
-//   OptionListSubSelected.value = -1
-//   combinedLists.forEach((array, index) => {
-//
-//     // 只检查数组的第一个元素的key
-//     const firstKey = array[0].key
-//
-//
-//     // 检查Map中是否已经有这个key的数组
-//     let group = groupedByKey.get(String(newVal))
-//
-//     // 如果没有，创建一个新的数组
-//     if (!group) {
-//       group = array
-//       groupedByKey.set(firstKey, group)
-//     } else {
-//       // 如果有，说明有重复的key，可以根据需要处理
-//       console.warn(`${index} Duplicate key found: ${firstKey}`)
-//     }
-//
-//   })
-//
-//   sitesPro = groupedByKey.get(String(playAddress2.value)) || []
-//
-//
-//   //进入文章列表，抓取最新文章
-//   if (sitesPro.length <= 0 || -1 == playAddress2.value) {
-//     scrapeArticles()
-//   }
-//
-// })
-//
 
 //改变选项卡目录
 const mountedOptionLists = (value: string, setbreadcrumb: string[], page: number, total: number, PaginationUrl: string, index: number) => {

@@ -1,11 +1,4 @@
-<!--
- * @职业: 自由 开发者
- * @Description:
- * @Author: KeHan
- * @Date: 2024-03-21 10:16:51
- * @LastEditTime: 2024-03-21 10:56:43
- * @LastEditors: KeHan
--->
+
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'

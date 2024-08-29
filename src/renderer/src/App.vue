@@ -1,11 +1,4 @@
-<!--
- * @职业: 自由 开发者
- * @Description:
- * @Author: KeHan
- * @Date: 2024-03-19 14:26:28
- * @LastEditTime: 2024-03-21 10:43:50
- * @LastEditors: KeHan
--->
+
 <script setup lang="ts">
 import { useStore } from 'vuex'
 import { computed } from 'vue'

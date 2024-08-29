@@ -1,11 +1,4 @@
-<!--
- * @职业: 自由 开发者
- * @Description:
- * @Author: KeHan
- * @Date: 2024-03-19 14:36:21
- * @LastEditTime: 2024-03-27 12:07:52
- * @LastEditors: KeHan
--->
+
 <script setup lang="ts">
 import { useStore } from 'vuex'
 import OptionList from './OptionList.vue'

@@ -1,11 +1,3 @@
-<!--
- * @职业: 自由 开发者
- * @Description:
- * @Author: KeHan
- * @Date: 2024-03-19 16:04:47
- * @LastEditTime: 2024-03-21 13:57:12
- * @LastEditors: KeHan
--->
 <script setup lang="ts">
 import * as cheerio from 'cheerio'
 import { ref, computed, watch } from 'vue'

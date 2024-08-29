@@ -6,6 +6,12 @@ import { ArrowUndoOutline as CashIcon } from '@vicons/ionicons5'
 import axios from 'axios'
 import IndexedDBManager from '../indexedDB.js'
 
+import {
+  // LogoMarkdown as LogoMarkdown,
+  PlayCircleSharp as LogoGooglePlaystore
+} from '@vicons/ionicons5'
+
+
 const loadingBar = useLoadingBar()
 const message = useMessage()
 const dialog = useDialog()
@@ -56,6 +62,21 @@ interface Notice {
   message: string
 }
 
+interface tvDramaCard {
+  comment?: number
+  Preview?: number
+  NexT?: string
+  name?: string
+  like?: number
+  moviesTab?: string
+  moviesUrl?: string
+  moviesImgUrl?: string
+  download?: boolean,
+  Progress: number,
+  prompt?: string,
+  prompt2?: string,
+  favorites?: boolean
+}
 
 // 使用store.commit来调用mutation
 const setNotices = (notices: Notice[]) => {
@@ -114,6 +135,11 @@ const setFavorite = (Favorite: string) => {
 const setskin = (skin: string) => {
   store.commit('SET_SKIN', skin)
 }
+
+const setVideoDetailsLoading = (url: string) => {
+  store.commit('SET_VIDEODETAILSLOADING', url)
+}
+
 
 const versionB = ref('')
 
@@ -318,6 +344,51 @@ async function clearFavorite() {
   setFavorite('Clear${' + `${timestamp}`)
 }
 
+//往历史，插入一个值
+async function setHistoryT(pro: tvDramaCard) {
+  let history = await dbManager.get('history')
+  const arrx: tvDramaCard[] = history?.inventory || []
+  console.log('arrx')
+
+  console.log(arrx)
+  // 如果 `history` 不存在，则创建一个新的 `history` 对象
+  if (!history) {
+    history = { id: 'history', inventory: arrx }
+    await dbManager.add(history)
+  } else {
+    // 如果 `history` 已存在，则直接修改 `inventory`
+    const itemToAdd = pro
+    const exists = arrx.some(item => item.name === itemToAdd.name)
+
+    if (!exists) {
+      arrx.unshift(itemToAdd)
+      history.inventory = arrx
+    }
+  }
+  console.log('history')
+  console.log(history)
+  // 更新 `history` 对象
+  await dbManager.update(history.id, history)
+}
+
+
+//推荐，点击
+const setCarouselRecommend = (url: string, imgUrl: string, name: string) => {
+  // 获取当前时间的时间戳
+  const timestamp = Date.now()
+  setVideoDetailsLoading(url + '${' + `${timestamp}`)
+  const pro = {
+    moviesUrl: imgUrl,
+    moviesImgUrl: url,
+    name: name,
+    Preview: Math.floor(Math.random() * 100) + 1,
+    like: Math.floor(Math.random() * 100) + 1,
+    comment: Math.floor(Math.random() * 100) + 1,
+    download: false,
+    Progress: 0
+  }
+  setHistoryT(pro)
+}
 
 </script>
 
@@ -335,11 +406,40 @@ async function clearFavorite() {
       ">
       <div style="flex: 20%" class="titleName">
         <div v-show="!PlayStarted" class="iconTitle">
-          <svg t="1724749688226" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="8639" width="18" height="18"><path d="M506.942496 517.671629m-428.081563 0a428.081564 428.081564 0 1 0 856.163127 0 428.081564 428.081564 0 1 0-856.163127 0Z" fill="#E3DEFF" p-id="8640"></path><path d="M505.786495 535.372892m-239.25605 0a239.25605 239.25605 0 1 0 478.512101 0 239.25605 239.25605 0 1 0-478.512101 0Z" fill="#FFFFFF" p-id="8641"></path><path d="M505.75037 789.078953a253.742186 253.742186 0 1 1 253.706061-253.706061A254.031186 254.031186 0 0 1 505.75037 789.078953zM505.75037 310.675228a224.842165 224.842165 0 1 0 224.80604 224.842164A225.09504 225.09504 0 0 0 505.75037 310.675228z" fill="#404951" p-id="8642"></path><path d="M519.803006 554.121781m-205.587526 0a205.587526 205.587526 0 1 0 411.175051 0 205.587526 205.587526 0 1 0-411.175051 0Z" fill="#E1D9FF" p-id="8643"></path><path d="M602.709941 572.762295m-87.205813 0a87.205814 87.205814 0 1 0 174.411627 0 87.205814 87.205814 0 1 0-174.411627 0Z" fill="#CBB8FF" p-id="8644"></path><path d="M602.709941 674.418119A101.655824 101.655824 0 1 1 704.438016 572.762295a101.7642 101.7642 0 0 1-101.728075 101.655824z m0-174.411628A72.755803 72.755803 0 1 0 675.537995 572.762295a72.828053 72.828053 0 0 0-72.828054-72.755804z" fill="#404951" p-id="8645"></path><path d="M222.385663 720.044027c-43.711282 0-70.190926-10.837508-79.077683-32.079023-18.423763-44.433783 54.18754-103.245326 118.453962-144.752981l15.714386 24.239893c-95.37007 61.629295-111.987582 98.549072-107.471953 109.45883 3.865378 9.284132 32.187399 21.675016 113.902208 8.597756 72.900303-11.560008 164.910746-39.412404 259.01644-78.499682s178.818881-84.532562 238.425174-127.990969c66.831299-48.732661 78.138432-77.452057 74.30918-86.700064-1.228251-2.962252-8.092006-12.752134-44.506033-14.052635-29.441897-1.011501-70.010301 4.046003-117.261836 14.775136l-6.321879-28.177521c78.391307-17.773513 175.856629-29.333521 194.858392 16.436887 30.164397 72.719678-179.866507 190.848515-328.412615 252.513935-96.16482 39.918154-190.487265 68.63755-265.591195 80.342059a426.925563 426.925563 0 0 1-66.036548 5.888379z" fill="#404951" p-id="8646"></path><path d="M416.84668 519.369505m-44.072532 0a44.072532 44.072532 0 1 0 88.145065 0 44.072532 44.072532 0 1 0-88.145065 0Z" fill="#CBB8FF" p-id="8647"></path><path d="M416.84668 578.000423a58.522543 58.522543 0 1 1 58.522543-58.522543 58.594793 58.594793 0 0 1-58.522543 58.522543z m0-88.145064a29.622522 29.622522 0 1 0 29.622522 29.622521 29.658647 29.658647 0 0 0-29.622522-29.730896z" fill="#404951" p-id="8648"></path></svg>
+          <svg t="1724749688226" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+               p-id="8639" width="18" height="18">
+            <path
+              d="M506.942496 517.671629m-428.081563 0a428.081564 428.081564 0 1 0 856.163127 0 428.081564 428.081564 0 1 0-856.163127 0Z"
+              fill="#E3DEFF" p-id="8640"></path>
+            <path
+              d="M505.786495 535.372892m-239.25605 0a239.25605 239.25605 0 1 0 478.512101 0 239.25605 239.25605 0 1 0-478.512101 0Z"
+              fill="#FFFFFF" p-id="8641"></path>
+            <path
+              d="M505.75037 789.078953a253.742186 253.742186 0 1 1 253.706061-253.706061A254.031186 254.031186 0 0 1 505.75037 789.078953zM505.75037 310.675228a224.842165 224.842165 0 1 0 224.80604 224.842164A225.09504 225.09504 0 0 0 505.75037 310.675228z"
+              fill="#404951" p-id="8642"></path>
+            <path
+              d="M519.803006 554.121781m-205.587526 0a205.587526 205.587526 0 1 0 411.175051 0 205.587526 205.587526 0 1 0-411.175051 0Z"
+              fill="#E1D9FF" p-id="8643"></path>
+            <path
+              d="M602.709941 572.762295m-87.205813 0a87.205814 87.205814 0 1 0 174.411627 0 87.205814 87.205814 0 1 0-174.411627 0Z"
+              fill="#CBB8FF" p-id="8644"></path>
+            <path
+              d="M602.709941 674.418119A101.655824 101.655824 0 1 1 704.438016 572.762295a101.7642 101.7642 0 0 1-101.728075 101.655824z m0-174.411628A72.755803 72.755803 0 1 0 675.537995 572.762295a72.828053 72.828053 0 0 0-72.828054-72.755804z"
+              fill="#404951" p-id="8645"></path>
+            <path
+              d="M222.385663 720.044027c-43.711282 0-70.190926-10.837508-79.077683-32.079023-18.423763-44.433783 54.18754-103.245326 118.453962-144.752981l15.714386 24.239893c-95.37007 61.629295-111.987582 98.549072-107.471953 109.45883 3.865378 9.284132 32.187399 21.675016 113.902208 8.597756 72.900303-11.560008 164.910746-39.412404 259.01644-78.499682s178.818881-84.532562 238.425174-127.990969c66.831299-48.732661 78.138432-77.452057 74.30918-86.700064-1.228251-2.962252-8.092006-12.752134-44.506033-14.052635-29.441897-1.011501-70.010301 4.046003-117.261836 14.775136l-6.321879-28.177521c78.391307-17.773513 175.856629-29.333521 194.858392 16.436887 30.164397 72.719678-179.866507 190.848515-328.412615 252.513935-96.16482 39.918154-190.487265 68.63755-265.591195 80.342059a426.925563 426.925563 0 0 1-66.036548 5.888379z"
+              fill="#404951" p-id="8646"></path>
+            <path
+              d="M416.84668 519.369505m-44.072532 0a44.072532 44.072532 0 1 0 88.145065 0 44.072532 44.072532 0 1 0-88.145065 0Z"
+              fill="#CBB8FF" p-id="8647"></path>
+            <path
+              d="M416.84668 578.000423a58.522543 58.522543 0 1 1 58.522543-58.522543 58.594793 58.594793 0 0 1-58.522543 58.522543z m0-88.145064a29.622522 29.622522 0 1 0 29.622522 29.622521 29.658647 29.658647 0 0 0-29.622522-29.730896z"
+              fill="#404951" p-id="8648"></path>
+          </svg>
         </div>
         <div v-show="!PlayStarted" :class="skin == 'lightTheme' ? 'titleTextX' : 'titleText'">Global TV</div>
         <div v-show="PlayStarted">
-          <n-button  strong secondary    style="  -webkit-app-region: no-drag;" size="small"
+          <n-button strong secondary style="  -webkit-app-region: no-drag;" size="small"
                     @click="closePlayStarted">
 
             <template #icon>
@@ -361,9 +461,1191 @@ async function clearFavorite() {
         <div :class="focusState == true ?'animated-input expanded':'animated-input'"
              style="-webkit-app-region: no-drag;">
           <n-input-group>
+            <n-popover trigger="click">
+              <template #trigger>
+                <n-input @focus="Onfocus" @blur="OnBlur" size="tiny" placeholder="输入影片名称..."
+                         v-model:value="searchInputValue" />
+              </template>
+              <n-tabs type="line" animated>
+                <n-tab-pane name="热搜" tab="热搜">
+                  <div style="  display: flex;
+                                flex-direction: row;
+                                flex-wrap: wrap;
+                                justify-content: flex-start;
+                                align-items: center;
+                                width: 400px;
+                  ">
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
 
-            <n-input @focus="Onfocus" @blur="OnBlur" size="tiny" placeholder="输入影片名称..."
-                     v-model:value="searchInputValue" />
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic4.iqiyipic.com/image/20240711/77/aa/a_100533301_m_601_m10.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/66491.html','https://snzypic.vip/upload/vod/20240718-1/da3471d45ff9bd4b459b63fb8f72015b.jpg','唐朝诡事录之西行')">
+
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          唐朝诡事录之西行
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic6.iqiyipic.com/image/20240823/8c/f7/a_100538841_m_601_m5.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/69796.html','https://snzypic.vip/upload/vod/20240823-1/1fd898cc6fe55637ae4a05e36d5a425f.jpg','四方馆')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          四方馆
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic1.iqiyipic.com/image/20240822/b5/5e/a_100585680_m_601_m4.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/69276.html','https://snzypic.vip/upload/vod/20240818-1/f2b594c70fedec95cbce263404cb6b83.jpg','前途无量')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          前途无量
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic3.iqiyipic.com/image/20240820/86/46/a_50117380_m_601_m22.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/16634.html','https://snzypic.vip/upload/vod/20230921-1/c4ffd2defa3631bddfb96b9e04db4333.jpg','西游记')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          西游记
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                  </div>
+                </n-tab-pane>
+                <n-tab-pane name="电视剧" tab="电视剧">
+                  <div style="  display: flex;
+                                flex-direction: row;
+                                flex-wrap: wrap;
+                                justify-content: flex-start;
+                                align-items: center;
+                                width: 400px;
+                  ">
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic8.iqiyipic.com/image/20240809/5f/ac/a_100585216_m_601_m4_318_424.webp">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/68367.html','https://snzypic.vip/upload/vod/20240808-1/1cd2feac632f61c26192990005c6cef3.jpg','幸福草')">
+
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          幸福草
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic4.iqiyipic.com/image/20240823/9a/be/a_100584693_m_601_m6_318_424.webp">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/68882.html','https://snzypic.vip/upload/vod/20240815-1/7e6e5ed7e7b3d84661befc1bf2f87497.jpg','侯门夫人不好当')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          侯门夫人不好当
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic2.iqiyipic.com/image/20240724/e1/d1/a_100544581_m_601_m19_318_424.webp">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/400.html','https://snzypic.vip/upload/vod/20240426-1/861710ae1b865b4e8766a3f665e17e96.jpg','偷得将军半日闲')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          偷得将军半日闲
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic1.iqiyipic.com/image/20240712/8b/c9/a_1005175050001_d_705_m7_440_608.webp">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/9031.html','https://snzypic.vip/upload/vod/20231128-1/bec3d1cadce75ead9f0282c233c2b8df.jpg','一念关山')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          一念关山
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                  </div>
+                </n-tab-pane>
+                <n-tab-pane name="电影" tab="电影">
+                  <div style="  display: flex;
+                                flex-direction: row;
+                                flex-wrap: wrap;
+                                justify-content: flex-start;
+                                align-items: center;
+                                width: 400px;
+                  ">
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic3.iqiyipic.com/image/20240712/2d/1a/v_176778482_m_601_m10_318_424.webp">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/62637.html','https://snzypic.vip/upload/vod/20240606-1/49d6866330b3747d54b9c18aef2a44fb.jpg','制暴')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">
+                              大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          制暴
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic4.iqiyipic.com/image/20240822/42/83/v_176667961_m_601_m4_440_608.webp">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/69426.html','https://snzypic.vip/upload/vod/20240820-1/ad10cb10735f47ba6c540e51315fd90f.jpg','狗阵')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">
+                              大陆</strong>
+                          </n-breadcrumb-item>
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          狗阵
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic1.iqiyipic.com/image/20240125/4e/76/v_1714153610003_d_705_440_608.webp">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/32518.html','https://snzypic.vip/upload/vod/20230831-1/ab4227a6000d81f54f813d6c6d401045.jpg','保你平安')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' "> 大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          保你平安
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic8.iqiyipic.com/image/20240415/95/ff/v_1755596770003_d_705_440_608.webp">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/2549.html','https://snzypic.vip/upload/vod/20240328-1/1c47722319699fdc7a887440eb92fd05.jpg','被我弄丢的你')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">   大陆</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          被我弄丢的你
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                  </div>
+                </n-tab-pane>
+                <n-tab-pane name="综艺" tab="综艺">
+                  <div style="  display: flex;
+                                flex-direction: row;
+                                flex-wrap: wrap;
+                                justify-content: flex-start;
+                                align-items: center;
+                                width: 400px;
+                  ">
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic9.iqiyipic.com/image/20240814/f6/7e/a_100572321_m_601_m16.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/68992.html','https://snzypic.vip/upload/vod/20240816-1/fe5c6a76be85cb37a592fd16a9781ae5.jpg','喜剧之王单口季')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">
+                              国产</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          喜剧之王单口季
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic3.iqiyipic.com/image/20240809/5e/f2/a_100572239_m_601_m7.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/68596.html','https://snzypic.vip/upload/vod/20240811-1/ac222d91008c568782fad964cb5d612d.jpg','音乐缘计划')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">
+                              国产</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          音乐缘计划
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic6.iqiyipic.com/image/20240430/6e/3e/a_100569186_m_601_m9.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/166.html','https://snzypic.vip/upload/vod/20240419-1/2a2bad16ada52606685027469488ad99.jpg','奔跑吧第八季')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">
+                              国产</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          奔跑吧第八季
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic9.iqiyipic.com/image/20240224/e7/15/a_100545219_m_601_m9.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/112.html','https://snzypic.vip/upload/vod/20240223-1/2bb595e188ca2c265d107810f070a4fd.jpg','种地吧2')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">
+                              国产</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          种地吧2
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                  </div>
+                </n-tab-pane>
+                <n-tab-pane name="动漫" tab="动漫">
+                  <div style="  display: flex;
+                                flex-direction: row;
+                                flex-wrap: wrap;
+                                justify-content: flex-start;
+                                align-items: center;
+                                width: 400px;
+                  ">
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic7.iqiyipic.com/image/20240611/82/3b/a_50167419_m_601_m91.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/3.html','https://snzypic.vip/upload/vod/20230911-1/708f29365f42f00240aa15df10db8b1a.jpg','名侦探柯南')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">
+                              日本</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          名侦探柯南
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic8.iqiyipic.com/image/20240823/ed/a7/a_100013977_m_601_m70.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/943.html','https://snzypic.vip/upload/vod/20230911-1/57b61c5428ad55cae57966c2320bc7de.jpg','航海王')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">
+                              日本</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          航海王
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic1.iqiyipic.com/image/20240708/66/46/a_100577014_m_601_m3.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/12671.html','https://snzypic.vip/upload/vod/20231103-1/0aa209d9ada3cbf008e959935d314c8a.jpg','蜡笔小新 第8季')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">日本</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          蜡笔小新 第8季
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                    <div :class="skin == 'lightTheme' ?'search-recommend-card-X':'search-recommend-card' ">
+
+
+                      <div style="width: 50%;height: 100%;padding: 5px;float: left;position: relative;">
+
+                        <img style="height: 100%;width: 100%;border-radius: 5px"
+                             src="https://pic4.iqiyipic.com/image/20240624/e9/fc/a_100579248_m_601.jpg">
+                        <div
+                          class="play_video"
+                          style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 3;
+                          "
+                        >
+
+
+                          <n-button text style="font-size: 24px"
+                                    @click="setCarouselRecommend('/mov/64720.html','https://snzypic.vip/upload/vod/20240629-1/c5b377a417c2d5175d4a57584529b79a.jpg','亚刻奥特曼')"
+                          >
+                            <n-icon>
+                              <logoGoogle-playstore />
+                            </n-icon>
+
+                          </n-button>
+                        </div>
+
+                      </div>
+                      <div style="width: 50%;height: 100%;padding: 5px;float: right;">
+                        <span>10.0分
+                          <n-tag type="error">
+                            热
+                          </n-tag>
+                        </span>
+                        <n-breadcrumb>
+                          <n-breadcrumb-item>
+                            <strong
+                              :style=" skin == 'lightTheme' ? ' color: rgb(18 18 18 / 30%); ' : ' color: rgb(255 255 255 / 30%); ' ">
+                              日本</strong>
+                          </n-breadcrumb-item>
+
+
+                        </n-breadcrumb>
+                        <div style="display: -webkit-box;
+                          -webkit-line-clamp: 2;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                          text-overflow: ellipsis;">
+                          亚刻奥特曼
+                        </div>
+
+
+                      </div>
+
+                    </div>
+                  </div>
+                </n-tab-pane>
+              </n-tabs>
+            </n-popover>
             <n-button type="info" size="tiny" @click="OnClickSearch">
               搜索
             </n-button>
@@ -659,13 +1941,56 @@ async function clearFavorite() {
 </template>
 
 <style scoped>
+
+.search-recommend-card-X:hover .play_video {
+  display: block;
+}
+
+.play_video {
+  display: none;
+}
+
+.search-recommend-card:hover .play_video {
+  display: block;
+}
+
+.search-recommend-card {
+  width: 150px;
+  height: 110px;
+  margin: 4px;
+  background-color: #3e3e43;
+  border: 1px solid #3e3e45;
+  border-radius: 5px;
+  flex: 1 1 auto;
+}
+
+.search-recommend-card:hover {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.search-recommend-card-X {
+  width: 150px;
+  height: 110px;
+  margin: 4px;
+  background-color: #f1f1f1;
+  border: 1px solid #fafafc;
+  border-radius: 5px;
+  flex: 1 1 auto;
+}
+
+.search-recommend-card-X:hover {
+  box-shadow: 0 0 10px rgba(66, 64, 64, 0.3);
+}
+
 @media (max-width: 620px) {
   .iconTitle {
     display: none;
   }
+
   .titleTextX {
     display: none;
   }
+
   .titleText {
     display: none;
   }

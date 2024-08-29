@@ -1016,6 +1016,16 @@ const showActive = () => {
     display: none;
   }
 }
+@media  (max-width: 868px) {
+  .left_layout {
+    display: none;
+  }
+  .center_layout {
+    width: 100% !important;
+    height: 100% !important;
+    float: none !important;
+  }
+}
 
 /* 当屏幕宽度至少为 400px 时 */
 @media (max-width: 798px) {
@@ -1038,19 +1048,13 @@ const showActive = () => {
     height: 130px !important;
   }
 
-  .left_layout {
-    display: none;
-  }
+
 
   .right_layout {
     display: none;
   }
 
-  .center_layout {
-    width: 100% !important;
-    height: 100% !important;
-    float: none !important;
-  }
+
 
 
 }
@@ -1098,13 +1102,13 @@ const showActive = () => {
 }
 
 .left_layout {
-  width: 20%;
+  width: 15%;
   height: 100%;
   float: left;
 }
 
 .center_layout {
-  width: 80%;
+  width: 85%;
   height: 100%;
   float: right;
 }

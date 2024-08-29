@@ -62,6 +62,22 @@ interface CaseServiceAgreement {
   CaseServiceAgreementTime?: string
 }
 
+interface tvDramaCard {
+  comment?: number
+  Preview?: number
+  NexT?: string
+  name?: string
+  like?: number
+  moviesTab?: string
+  moviesUrl?: string
+  moviesImgUrl?: string
+  download?: boolean,
+  Progress: number,
+  prompt?: string,
+  prompt2?: string,
+  favorites?: boolean
+}
+
 const dbManager = new IndexedDBManager()
 
 const message = useMessage()
@@ -183,6 +199,11 @@ const setCaseServiceAgreement = (CaseServiceAgreement: boolean) => {
   store.commit('SET_CASE_SERVICE_AGREEMENT', CaseServiceAgreement)
 }
 
+const setVideoDetailsLoading = (url: string) => {
+  store.commit('SET_VIDEODETAILSLOADING', url)
+}
+
+
 //发生了分页行为
 const pagination = (page: number) => {
   setpage(page)//改变vuex中页码
@@ -220,6 +241,48 @@ function getRandomType(): 'default' | 'primary' | 'info' | 'success' | 'warning'
   const types: ('default' | 'primary' | 'info' | 'success' | 'warning' | 'error')[] = ['default', 'primary', 'info', 'success', 'warning', 'error']
   const randomIndex = Math.floor(Math.random() * types.length)
   return types[randomIndex]
+}
+
+//轮播首页推荐，点击
+const setCarousel = (url: string, imgUrl: string, name: string) => {
+  // 获取当前时间的时间戳
+  const timestamp = Date.now()
+  setVideoDetailsLoading(url + '${' + `${timestamp}`)
+  const pro = {
+    moviesUrl: imgUrl,
+    moviesImgUrl: url,
+    name: name,
+    Preview: Math.floor(Math.random() * 100) + 1,
+    like: Math.floor(Math.random() * 100) + 1,
+    comment: Math.floor(Math.random() * 100) + 1,
+    download: false,
+    Progress: 0
+  }
+  setHistory(pro)
+}
+
+//往历史，插入一个值
+async function setHistory(pro: tvDramaCard) {
+  let history = await dbManager.get('history')
+  const arrx: tvDramaCard[] = history?.inventory || []
+
+  // 如果`history`不存在，则创建一个新的`history`对象
+  if (!history) {
+    history = { id: 'history', inventory: arrx }
+    await dbManager.add(history)
+  } else {
+    // 如果`history`已存在，则直接修改`inventory`
+    const itemToAdd = pro
+    const exists = arrx.some(item => item.name === itemToAdd.name)
+
+    if (!exists) {
+      arrx.unshift(itemToAdd)
+      history.inventory = arrx
+    }
+  }
+  // 更新`history`对象
+  await dbManager.update(history.id, history)
+
 }
 
 //监听是否需要展开详情
@@ -333,7 +396,6 @@ const checkForUpdates = async () => {
 let intervalId2: NodeJS.Timeout | null = null
 
 
-
 const checkForRemoteStartStop = async () => {
   try {
     const response = await axios.get('https://raw.githubusercontent.com/65tiankehan/GlobalTV_profile/main/RemoteStartStop.json')
@@ -393,7 +455,10 @@ async function setProtocol18DB(value: boolean) {
 watch(playRoute, (newVal, oldVal) => {
   console.log('playRoute changed from', oldVal, 'to', newVal)
   paginationState.value = true
-
+  //调整TvDramaCanvas高度
+  TVDramaCanvasHeight.value = 'height:95%;'
+  //隐藏论播图
+  breadcrumbState.value = true
 
 })
 //监听 breadcrumbs的变化，启用分页
@@ -451,6 +516,7 @@ const active = ref(false)
 const showActive = () => {
   active.value = !active.value
 }
+
 </script>
 
 <template>
@@ -497,6 +563,7 @@ const showActive = () => {
             justify-content: space-between;
             align-items: center;
             padding: 0 10px;
+            padding-right: 15px;
           "
         >
           <n-space>
@@ -526,30 +593,37 @@ const showActive = () => {
         <div class="BreadcrumbStateImg" v-if="!breadcrumbState" style="  width: 100%;padding: 0 16px;">
           <n-carousel autoplay show-arrow>
             <img
+              @click="setCarousel('/mov/69796.html','https://snzypic.vip/upload/vod/20240823-1/1fd898cc6fe55637ae4a05e36d5a425f.jpg','四方馆')"
               class="carousel-img"
               src="https://pic3.iqiyipic.com/lequ/common/lego/20240827/aeb78ec544c94803bd8e14d7bd682633.jpg"
             >
             <img
+              @click="setCarousel('/mov/68872.html','https://snzypic.vip/upload/vod/20240814-1/ccd643ac4bcacb5d0791c795a0802404.jpg','九部的检察官')"
               class="carousel-img"
               src="https://pic3.iqiyipic.com/lequ/common/lego/20240826/80687ab5dca14a039d23ee3d5c20f19d.jpg"
             >
             <img
+              @click="setCarousel('/mov/68175.html','https://snzypic.vip/upload/vod/20240806-1/cb16f79a7e9bf87e07058e1aa1e67d6b.jpg','孤舟')"
               class="carousel-img"
               src="https://pic3.iqiyipic.com/lequ/common/lego/20240823/a6ba9aa583eb4ec0ad893a5775ec451d.jpg"
             >
             <img
+              @click="setCarousel('/mov/69276.html','https://snzypic.vip/upload/vod/20240818-1/f2b594c70fedec95cbce263404cb6b83.jpg','前途无量')"
               class="carousel-img"
               src="https://pic1.iqiyipic.com/lequ/common/lego/20240818/4cd7fb7ee85e4ca083493823bf4b7506.jpg"
             >
             <img
+              @click="setCarousel('/mov/67657.html','https://snzypic.vip/upload/vod/20240731-1/cb37d1589f489063b7bbef5cbccda40e.jpg','四海重明')"
               class="carousel-img"
               src="https://pic0.iqiyipic.com/lequ/common/lego/20240819/b397b52791a94947bc9b590df741e36d.jpg"
             >
             <img
+              @click="setCarousel('/play/67655-1-1.html','https://snzypic.vip/upload/vod/20240731-1/46a385826eaa9fef4723ac565231f8f9.jpg','小夫妻')"
               class="carousel-img"
               src="https://pic3.iqiyipic.com/lequ/common/lego/20240816/9f6f06df974341abb10d6fba14ebc62f.jpg"
             >
             <img
+              @click="setCarousel('/mov/69638.html','https://snzypic.vip/upload/vod/20240822-1/3b54c1d9d589f26291aa788bfdaf0e47.jpg','氪金男友')"
               class="carousel-img"
               src="https://pic3.iqiyipic.com/lequ/common/lego/20240822/5851577964ff48b7b0c5d55bf5375e02.jpg"
             >

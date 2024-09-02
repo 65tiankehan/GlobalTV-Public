@@ -15,6 +15,7 @@ interface smartRoutePath {
 export default createStore({
   state() {
     return {
+      Detour:true,
       CaseServiceAgreement: false,
       protocol18: false,
       isToggLed: '0-0',
@@ -49,6 +50,9 @@ export default createStore({
     }
   },
   getters: {
+    getDetour: (state) => {
+      return state.Detour
+    },
     getCaseServiceAgreement: (state) => {
       return state.CaseServiceAgreement
     },
@@ -139,6 +143,9 @@ export default createStore({
 
   },
   mutations: {
+    SET_DETOUR: (state, payload) => {
+      state.Detour = payload
+    },
     SET_CASE_SERVICE_AGREEMENT: (state, payload) => {
       state.CaseServiceAgreement = payload
     },

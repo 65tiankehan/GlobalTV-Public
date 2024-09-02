@@ -80,12 +80,12 @@ window.electron.ipcRenderer.on('version-response-Y', (_event, version) => {
 
 <template>
   <div :class="skin == 'lightTheme' ? 'update_Layout_X' : 'update_Layout'">
-    <div :class="skin == 'lightTheme' ? '' : 'circle' "></div>
+    <div :class="skin == 'lightTheme' ? '' : '' "></div>
     <div class="update_Handler">
       <n-space vertical>
         <n-breadcrumb>
           <n-breadcrumb-item>
-            Global Book
+            GlobeStream
           </n-breadcrumb-item>
           <n-breadcrumb-item>
             版本
@@ -205,7 +205,7 @@ video {
   -webkit-app-region: drag;
   background-color: #222222;
   height: 100%;
-  background-image: url("../assets/laod8.png");
+  background-image: url("../assets/laodx2.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -215,7 +215,7 @@ video {
   -webkit-app-region: drag;
   background-color: #222222;
   height: 100%;
-  background-image: url("../assets/laod6.png");
+  background-image: url("../assets/laodx1.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

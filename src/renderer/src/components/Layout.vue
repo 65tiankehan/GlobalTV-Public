@@ -150,6 +150,8 @@ const protocol18 = computed(() => store.getters.getProtocol18)
 
 const caseServiceAgreement = computed(() => store.getters.getCaseServiceAgreement)
 
+
+
 // 使用store.commit来调用mutation
 const setplayVideoType = (url: string) => {
   store.commit('SET_PAYVIDEOTYPE', url)
@@ -394,7 +396,7 @@ const checkForRemoteStartStop = async () => {
     const response = await axios.get('https://raw.githubusercontent.com/65tiankehan/GlobalTV_profile/main/RemoteStartStop.json')
     const remoteStartStop: RemoteStartStop = response.data
     if (!remoteStartStop.switch) {//关闭窗口
-      window.electron.ipcRenderer.send('closeWin')
+       window.electron.ipcRenderer.send('closeWin')
     }
 
   } catch (error) {
@@ -636,7 +638,7 @@ const showActive = () => {
   <n-modal v-model:show="showUpdate" :mask-closable="false">
     <n-card
       style="width: 600px"
-      title="Global TV Update 通知"
+      title="GlobeStream Update 通知"
       :bordered="false"
       size="huge"
       role="dialog"
@@ -959,6 +961,7 @@ const showActive = () => {
       </template>
     </n-card>
   </n-modal>
+
 </template>
 
 <style scoped>

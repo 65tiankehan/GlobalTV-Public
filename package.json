@@ -1,6 +1,6 @@
 {
   "name": "GlobeStream",
-  "version": "1.0.45",
+  "version": "1.0.46",
   "description": "GlobeStream A film and television software",
   "main": "./out/main/index.js",
   "author": "example.com",

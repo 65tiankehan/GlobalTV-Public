@@ -1,7 +1,7 @@
 {
-  "name": "GlobalTV",
-  "version": "1.0.44",
-  "description": "An Electron application with Vue and TypeScript",
+  "name": "GlobeStream",
+  "version": "1.0.45",
+  "description": "GlobeStream A film and television software",
   "main": "./out/main/index.js",
   "author": "example.com",
   "homepage": "https://electron-vite.org",

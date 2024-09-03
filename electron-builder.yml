@@ -1,5 +1,5 @@
 appId: com.65tiankehan.GlobalTV-Public
-productName: GlobalTV
+productName: GlobeStream
 directories:
   buildResources: build
 files:
@@ -12,7 +12,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: GlobalTV
+  executableName: GlobeStream
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

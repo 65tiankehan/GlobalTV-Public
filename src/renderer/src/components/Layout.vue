@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { useStore } from 'vuex'
 import OptionList from './OptionList.vue'
@@ -149,7 +148,6 @@ const skin = computed(() => store.getters.getSkin)
 const protocol18 = computed(() => store.getters.getProtocol18)
 
 const caseServiceAgreement = computed(() => store.getters.getCaseServiceAgreement)
-
 
 
 // 使用store.commit来调用mutation
@@ -396,7 +394,7 @@ const checkForRemoteStartStop = async () => {
     const response = await axios.get('https://raw.githubusercontent.com/65tiankehan/GlobalTV_profile/main/RemoteStartStop.json')
     const remoteStartStop: RemoteStartStop = response.data
     if (!remoteStartStop.switch) {//关闭窗口
-       window.electron.ipcRenderer.send('closeWin')
+      window.electron.ipcRenderer.send('closeWin')
     }
 
   } catch (error) {
@@ -630,8 +628,9 @@ const showActive = () => {
     <!--    播放页面-->
     <div style="width: 100%; height: 100%" v-if="PlayStarted == true">
       <div style="padding-top: 39px; height: 100%; width: 100%">
-        <Play v-if="PlayStarted" :my-prop-img="dramaDetails.imgUrl" :streamingSource="dramaDetails.streamingSources"
-              :my-prop-title="dramaDetails.title" />
+        <Play v-if="PlayStarted" :my-description="dramaDetails.Scenario" :my-prop-img="dramaDetails.imgUrl"
+              :streamingSource="dramaDetails.streamingSources"
+              :my-prop-title="dramaDetails.title" :my-tag="dramaDetails.tags" />
       </div>
     </div>
   </div>
@@ -1012,10 +1011,12 @@ const showActive = () => {
     display: none;
   }
 }
-@media  (max-width: 868px) {
+
+@media (max-width: 868px) {
   .left_layout {
     display: none;
   }
+
   .center_layout {
     width: 100% !important;
     height: 100% !important;
@@ -1045,12 +1046,9 @@ const showActive = () => {
   }
 
 
-
   .right_layout {
     display: none;
   }
-
-
 
 
 }
